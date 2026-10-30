@@ -1,0 +1,60 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.5.15/schema.json",
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
+	"files": {
+		"ignoreUnknown": true,
+		"includes": [
+			"**",
+			"!!**/static",
+			"!worker-configuration.d.ts",
+			"!**/bun.lock",
+			"!**/bun.lockb",
+			"!**/package-lock.json",
+			"!**/pnpm-lock.yaml",
+			"!**/yarn.lock"
+		]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 2,
+		"lineEnding": "lf",
+		"lineWidth": 100
+	},
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended"
+		}
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "single",
+			"trailingCommas": "none",
+			"semicolons": "always",
+			"arrowParentheses": "always"
+		}
+	},
+	"json": {
+		"formatter": {
+			"trailingCommas": "none"
+		}
+	},
+	"css": {
+		"parser": {
+			"tailwindDirectives": true
+		}
+	},
+	"html": {
+		"experimentalFullSupportEnabled": true,
+		"formatter": {
+			"enabled": true,
+			"indentScriptAndStyle": true,
+			"selfCloseVoidElements": "always"
+		}
+	}
+}

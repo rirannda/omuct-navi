@@ -1,0 +1,12 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="entrance_f1" fill="#ffffff" fill-opacity="0.6">
+<path id="entrance_flame" fill-rule="evenodd" clip-rule="evenodd" d="M643.5 1276.5H561.5L561.577 1324H741V1317H766.5V1284H643.5V1276.5Z" stroke="black"/>
+<path id="stair_entrance_f1_w" d="M591 1296.5H594.5V1286H591M591 1296.5V1286M591 1296.5H587.5M591 1286H587.5M587.5 1296.5V1286M587.5 1296.5H584M587.5 1286H584M584 1296.5V1286M584 1296.5H581V1286H584" stroke="black"/>
+<path id="stair_entrance_f1_e" d="M612.5 1296.5H609V1286H612.5M612.5 1296.5V1286M612.5 1296.5H616M612.5 1286H616M616 1296.5V1286M616 1296.5H619.5M616 1286H619.5M619.5 1296.5V1286M619.5 1296.5H622.5V1286H619.5" stroke="black"/>
+<path id="landing" fill-rule="evenodd" clip-rule="evenodd" d="M609 1296.5H594.5V1276.5H609V1296.5Z" stroke="black"/>
+<g id="arrow_f1">
+<path id="Vector 85" d="M596 1292H599.5V1280.5M601 1282L599.5 1280.5L598 1282" stroke="black"/>
+<path id="Vector 86" d="M607 1292H603.5V1280.5M602 1282L603.5 1280.5L605 1282" stroke="black"/>
+</g>
+</g>
+</svg>

@@ -1,30 +1,40 @@
 <svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="ss-bldg_1_F1">
-<path id="flame" fill-rule="evenodd" clip-rule="evenodd" d="M921 929.5H627V836H921V929.5Z" stroke="blue"/>
-<path id="startup-ws" fill-rule="evenodd" clip-rule="evenodd" d="M692.5 879H627V929.5H692.5V879Z" stroke="blue"/>
-<path id="pr_dyn-des" fill-rule="evenodd" clip-rule="evenodd" d="M839 867.5V836H855.5V867.5H839Z" stroke="blue"/>
-<path id="lab_dyn-des" fill-rule="evenodd" clip-rule="evenodd" d="M822.5 867.5H839V836H822.5V867.5Z" stroke="blue"/>
-<path id="po_d_furuta" fill-rule="evenodd" clip-rule="evenodd" d="M807 867.5H822.5V836H807V867.5Z" stroke="blue"/>
-<path id="lab_data-process-2" fill-rule="evenodd" clip-rule="evenodd" d="M790.5 867.5H807V836H790.5V867.5Z" stroke="blue"/>
-<path id="lab_data-process-1" fill-rule="evenodd" clip-rule="evenodd" d="M774 867.5H790.5V836H774V867.5Z" stroke="blue"/>
-<path id="lab_pow-elec-ctrl" fill-rule="evenodd" clip-rule="evenodd" d="M758 929.5H692.5V879H758V929.5Z" stroke="blue"/>
-<path id="po_e_kawakami" fill-rule="evenodd" clip-rule="evenodd" d="M741.5 897.5V929.5H758V897.5H741.5Z" stroke="blue"/>
-<path id="lab_elec-eng" fill-rule="evenodd" clip-rule="evenodd" d="M855.5 929.5H790.5V879H855.5V929.5Z" stroke="blue"/>
-<path id="lab_des-eng" fill-rule="evenodd" clip-rule="evenodd" d="M888 879H855.5V910.5H888V879Z" stroke="blue"/>
-<path id="stg_ss-bldg-1_f1_east" fill-rule="evenodd" clip-rule="evenodd" d="M912.5 867.5H921V852H912.5V867.5Z" stroke="blue"/>
-<path id="stair_ss-bldg-1_f1-f2_east" d="M927.5 889.5H921V865.5H927.5V889.5Z" stroke="blue"/>
-<path id="wc_men_ss-bldg-1_f1" fill-rule="evenodd" clip-rule="evenodd" d="M921 836V852H904.5V836H921Z" stroke="blue"/>
-<path id="technical_support_office" fill-rule="evenodd" clip-rule="evenodd" d="M904.5 867.5V836H855.5V867.5H904.5Z" stroke="blue"/>
-<path id="to_hirai" fill-rule="evenodd" clip-rule="evenodd" d="M888 910.5H855.5V929.5H888V910.5Z" stroke="blue"/>
-<path id="po_e_nakatsu" fill-rule="evenodd" clip-rule="evenodd" d="M921 910.5H888V929.5H921V910.5Z" stroke="blue"/>
-<path id="lab_add-mfg" fill-rule="evenodd" clip-rule="evenodd" d="M921 910.5H888V879H921V910.5Z" stroke="blue"/>
-<path id="lab_visualization" fill-rule="evenodd" clip-rule="evenodd" d="M758 867.5H774V836H758V867.5Z" stroke="blue"/>
-<path id="lab_sig-anl" fill-rule="evenodd" clip-rule="evenodd" d="M741.5 867.5H758V836H741.5V867.5Z" stroke="blue"/>
-<path id="lab_info-media" fill-rule="evenodd" clip-rule="evenodd" d="M725 867.5H741.5V836H725V867.5Z" stroke="blue"/>
-<path id="po_e_enokura" fill-rule="evenodd" clip-rule="evenodd" d="M708.5 867.5H725V836H708.5V867.5Z" stroke="blue"/>
-<path id="lab_it" fill-rule="evenodd" clip-rule="evenodd" d="M659.5 867.5H708.5V836H659.5V867.5Z" stroke="blue"/>
-<path id="lab_degital-modeling" fill-rule="evenodd" clip-rule="evenodd" d="M627 867.5H659.5V836H627V867.5Z" stroke="blue"/>
-<path id="stair_ss-bldg-1_f1-f2_center" d="M782.5 887H774.5V902.5H782.5V887Z" stroke="blue"/>
-<path id="stg_ss-bldg-1_f1_center" fill-rule="evenodd" clip-rule="evenodd" d="M766 887H774.5V902.5H782.5V910.5H766V887Z" stroke="blue"/>
+<g id="ss-bldg_1_F3"  fill="#ffffff" fill-opacity="0.6">
+<path id="ss1_f3_flame" d="M627 836H921V929.5H627V836Z" stroke="black"/>
+<path id="void-ss1-f3" fill-rule="evenodd" clip-rule="evenodd" d="M921 914H627V929.5H921V914Z" stroke="black"/>
+<path id="mc-room" d="M627 836H660V867.5H627V836Z" stroke="black"/>
+<path id="spare-ss1-f3" d="M660 836H692V867.5H660V836Z" stroke="black"/>
+<path id="po-ss1-f3" d="M692 836H708.5V867.5H692V836Z" stroke="black"/>
+<path id="pr-ss1-f3" d="M708.5 836H725V867.5H708.5V836Z" stroke="black"/>
+<path id="lab-communication-engineering-1" d="M725 836H774V867.5H725V836Z" stroke="black"/>
+<path id="po-e-umemoto" d="M774 836H790.5V867.5H774V836Z" stroke="black"/>
+<path id="po-e-kaneda" d="M790.5 836H806.5V867.5H790.5V836Z" stroke="black"/>
+<path id="lab-control-engineering" d="M806.5 836H888.5V867.5H806.5V836Z" stroke="black"/>
+<path id="po-d-nakatani" d="M888.5 836H904.5V867.5H888.5V836Z" stroke="black"/>
+<path id="wc-womens_ss1_f3" d="M904.5 836H921V852H904.5V836Z" stroke="black"/>
+<path id="stg_ss1_f3_east" d="M912.5 852H921V867.5H912.5V852Z" stroke="black"/>
+<path id="lab-software-engineering" d="M627 879H643.5V914H627V879Z" stroke="black"/>
+<path id="po-i-kimura" d="M643.5 879H660V914H643.5V879Z" stroke="black"/>
+<path id="co-e" d="M660 879H676V914H660V879Z" stroke="black"/>
+<path id="lab-communication-engineering-2" d="M692.5 879H725V914H692.5V879Z" stroke="black"/>
+<path id="online-meeting" fill-rule="evenodd" clip-rule="evenodd" d="M692.5 879H676V914H692.5V879Z" stroke="black"/>
+<path id="lab-electronics-1" d="M725 879H758V914H725V879Z" stroke="black"/>
+<path id="lab-electronics-2" d="M790.5 879H822.5V914H790.5V879Z" stroke="black"/>
+<path id="po-i-niitsuma" d="M822.5 879H838.5V914H822.5V879Z" stroke="black"/>
+<path id="po-i-wada" d="M855.5 879H871.5V914H855.5V879Z" stroke="black"/>
+<path id="po-d-maeda" d="M904 879H921V914H904V879Z" stroke="black"/>
+<path id="po-spare-ss1-f3" fill-rule="evenodd" clip-rule="evenodd" d="M855.5 879H838.5V914H855.5V879Z" stroke="black"/>
+<path id="po-e-maeda" fill-rule="evenodd" clip-rule="evenodd" d="M888 879H871.5V914H888V879Z" stroke="black"/>
+<path id="po-d-yabu" fill-rule="evenodd" clip-rule="evenodd" d="M904 879H888V914H904V879Z" stroke="black"/>
+<g id="stair_ss1_f3_center">
+<path id="stair_ss1_f2_center_flame" d="M766.5 887H782.5V914H766.5V887Z" stroke="black"/>
+<path id="stair_ss1_f2_center_lines" d="M766.5 891H782.5M766.5 895H782.5M766.5 899H782.5M766.5 903H782.5" stroke="black" stroke-width="0.5"/>
+</g>
+<g id="stair_ss1_f3_east" fill-opacity="1">
+<path id="stair_ss1_f2_east_flame" d="M921 867.5H933V898.5H921V867.5Z" stroke="black"/>
+<path id="stair_ss1_f2_east_lines" d="M921 873.5H933M921 879.5H933M921 885.5H933M921 891.5H933" stroke="black" stroke-width="0.5"/>
+</g>
+<path id="stairwell_ss1_f3_center-1" fill-rule="evenodd" clip-rule="evenodd" d="M766.5 887H758V914H766.5V887Z" stroke="black"/>
+<path id="stairwell_ss1_f3_center-2" fill-rule="evenodd" clip-rule="evenodd" d="M790.5 887H782.5V914H790.5V887Z" stroke="black"/>
 </g>
 </svg>

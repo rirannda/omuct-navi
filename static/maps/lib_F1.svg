@@ -1,0 +1,15 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="lib_F1" fill="#ffffff" fill-opacity="0.6">
+<path id="lib_f1_flame" fill-rule="evenodd" clip-rule="evenodd" d="M814 1020H921V1148H873.5H857.5H826V1047H814V1020Z" stroke="black"/>
+<path id="stair_lib_f1-s" d="M857.5 1166V1170.5H873.5V1166M857.5 1166V1161.5M857.5 1166H873.5M873.5 1166V1161.5M873.5 1161.5V1157M873.5 1161.5H857.5M873.5 1157V1152.5M873.5 1157H857.5M873.5 1152.5H857.5M873.5 1152.5V1148H857.5V1152.5M857.5 1152.5V1157M857.5 1157V1161.5" stroke="black"/>
+<path id="slope_lib_f1-w" fill-rule="evenodd" clip-rule="evenodd" d="M814 1070H826V1047H814V1070Z" stroke="black"/>
+<path id="wc-mens_lib_f1" fill-rule="evenodd" clip-rule="evenodd" d="M826 1047H814V1020H826V1047Z" stroke="black"/>
+<path id="wc-womens_lib_f1" fill-rule="evenodd" clip-rule="evenodd" d="M834 1020H826V1039.5H834V1020Z" stroke="black"/>
+<path id="stg_lib_f1" fill-rule="evenodd" clip-rule="evenodd" d="M841.5 1039.5H834V1020H850V1027.5H841.5V1039.5Z" stroke="black"/>
+<path id="stair_lib_f1-n" d="M850 1035.5H841.5M850 1035.5V1031.5M850 1035.5V1039.5H841.5V1035.5M841.5 1035.5V1031.5M841.5 1031.5H850M841.5 1031.5V1027.5H850V1031.5" stroke="black"/>
+<path id="library-stacks_lib_f1" fill-rule="evenodd" clip-rule="evenodd" d="M850 1047V1020H921V1047H850Z" stroke="black"/>
+<path id="reading-room" fill-rule="evenodd" clip-rule="evenodd" d="M874 1070H826V1148H874V1070Z" stroke="black"/>
+<path id="open-stacks_lib_f1" fill-rule="evenodd" clip-rule="evenodd" d="M921 1148H874V1074H921V1148Z" stroke="black"/>
+<path id="library-office" fill-rule="evenodd" clip-rule="evenodd" d="M861.5 1070V1047H921V1074H874V1070H861.5Z" stroke="black"/>
+</g>
+</svg>

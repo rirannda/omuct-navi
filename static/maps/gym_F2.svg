@@ -1,0 +1,17 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="gym_F2" fill="#ffffff" fill-opacity="0.6">
+<path id="gym_f2_flame" d="M741 1317H954V1453H741V1317Z" stroke="black"/>
+<path id="table-tennis-room" d="M741 1317H770V1453H741V1317Z" stroke="black"/>
+<path id="po-gym-hashizume" d="M741 1421H762V1453H741V1421Z" stroke="black"/>
+<path id="gallery_gym_f2" d="M770 1317H933.5V1325H770V1317Z" stroke="black"/>
+<path id="void-gym-f2" d="M770 1325L933.5 1325L933.5 1445L770 1445Z" stroke="black"/>
+<path id="gallery_gym_f2_south" d="M770 1445H933.5V1453H770V1445Z" stroke="black"/>
+<path id="broadcast-room_gym_f2" d="M933.5 1317H954V1349H933.5V1317Z" stroke="black"/>
+<path id="void-gym-f2-east" d="M933.5 1349L954 1349L954 1421L933.5 1421Z" stroke="black"/>
+<path id="equipment-room_gym_f2" d="M933.5 1421H954V1453H933.5V1421Z" stroke="black"/>
+<g id="stair_gym_f2_west">
+<path id="stair_gym_f2_west_flame" d="M741 1405H762V1421H741V1405Z" stroke="black"/>
+<path id="stair_gym_f2_west_lines" d="M745 1405V1421M749.5 1405V1421M753.5 1405V1421M758 1405V1421" stroke="black" stroke-width="0.5"/>
+</g>
+</g>
+</svg>

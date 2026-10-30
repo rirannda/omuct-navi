@@ -1,0 +1,13 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="cepc-bldg_F1" fill="#ffffff" fill-opacity="0.6">
+<path id="cepc_f1_flame" fill-rule="evenodd" clip-rule="evenodd" d="M974.5 834.5L967 841.5V875H1085.5V845.5V834.5H974.5Z" stroke="black"/>
+<path id="stair_cepc_f1_e" d="M1088.5 838.5H1097.5M1088.5 838.5V842.5M1088.5 838.5V834.5H1097.5V838.5M1097.5 838.5V842.5M1097.5 842.5H1088.5M1097.5 842.5V846.5M1088.5 842.5V846.5M1088.5 846.5V849.5H1097.5V846.5M1088.5 846.5H1097.5" stroke="black"/>
+<path id="wc-bf_cepc_f1" fill-rule="evenodd" clip-rule="evenodd" d="M982 864H974V875H982V864Z" stroke="black"/>
+<path id="stair_cepc_f1_w" d="M974 857H982M974 857V860.5M974 857V853M982 857V860.5M982 857V853M982 860.5H974M982 860.5V864H974V860.5M974 853V849H982V853M974 853H982" stroke="black"/>
+<path id="po-d-satonaka" fill-rule="evenodd" clip-rule="evenodd" d="M996.5 845.5H982V875H996.5V845.5Z" stroke="black"/>
+<path id="lr-mechanical-design-production" fill-rule="evenodd" clip-rule="evenodd" d="M1026 845.5H996.5V875H1026V845.5Z" stroke="black"/>
+<path id="lab-mechanical-design-production" fill-rule="evenodd" clip-rule="evenodd" d="M1085.5 875H1026V845.5H1041V834.5H1070.5V845.5H1085.5V875Z" stroke="black"/>
+<path id="tool-room_mechanical-design-production" fill-rule="evenodd" clip-rule="evenodd" d="M1085.5 834.5H1070.5V845.5H1085.5V834.5Z" stroke="black"/>
+<path id="pr-mechanical-design-production" fill-rule="evenodd" clip-rule="evenodd" d="M1041 845.5H1011V834.5H1041V845.5Z" stroke="black"/>
+</g>
+</svg>

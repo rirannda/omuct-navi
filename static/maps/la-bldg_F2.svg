@@ -1,22 +1,38 @@
 <svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="la-bldg_F1">
-<path id="flame" fill-rule="evenodd" clip-rule="evenodd" d="M381 1182.5V1027.5H581V1182.5H381Z" stroke="red"/>
-<path id="atrium" fill-rule="evenodd" clip-rule="evenodd" d="M552 1071.5H410V1143H552V1071.5Z" stroke="red"/>
-<path id="hr_1-4" fill-rule="evenodd" clip-rule="evenodd" d="M414.5 1182.5H381V1151H414.5V1182.5Z" stroke="red"/>
-<path id="hr_1-3" fill-rule="evenodd" clip-rule="evenodd" d="M448 1151H414.5V1182.5H448V1151Z" stroke="red"/>
-<path id="locker_1" fill-rule="evenodd" clip-rule="evenodd" d="M481 1182.5H448V1151H481V1182.5Z" stroke="red"/>
-<path id="hr_1-2" fill-rule="evenodd" clip-rule="evenodd" d="M514.5 1182.5H481V1151H514.5V1182.5Z" stroke="red"/>
-<path id="hr_1-1" fill-rule="evenodd" clip-rule="evenodd" d="M547.5 1182.5H514.5V1151H547.5V1182.5Z" stroke="red"/>
-<path id="wc_men_la-bldg_f1" fill-rule="evenodd" clip-rule="evenodd" d="M564.5 1083H581V1107H564.5V1083Z" stroke="red"/>
-<path id="stair_la-bldg_f1-f2_west" fill-rule="evenodd" clip-rule="evenodd" d="M398 1083.5H381V1099H390V1091.5H398V1083.5Z" stroke="red"/>
-<path id="stair_la-bldg_f1-f1_east" fill-rule="evenodd" clip-rule="evenodd" d="M572.5 1123V1115H581V1131H564.5V1123H572.5Z" stroke="red"/>
-<path id="stg_la-bldg_f1_west" fill-rule="evenodd" clip-rule="evenodd" d="M398 1099H381V1107H398V1099Z" stroke="red"/>
-<path id="wc_women_la-bldg_f1" fill-rule="evenodd" clip-rule="evenodd" d="M398 1107H381V1131H398V1107Z" stroke="red"/>
-<path id="stg_la-bldg_f1_east" fill-rule="evenodd" clip-rule="evenodd" d="M564.5 1115V1107H581V1115H564.5Z" stroke="red"/>
-<path id="lab_chem" fill-rule="evenodd" clip-rule="evenodd" d="M497.5 1027.5H447.5V1071.5H497.5V1027.5Z" stroke="red"/>
-<path id="po_chem" fill-rule="evenodd" clip-rule="evenodd" d="M531 1027.5H497.5V1063.5H531V1027.5Z" stroke="red"/>
-<path id="lr_chem" fill-rule="evenodd" clip-rule="evenodd" d="M581 1063.5H539.5V1027.5H581V1063.5Z" stroke="red"/>
-<path id="or_2" fill-rule="evenodd" clip-rule="evenodd" d="M422.5 1027.5H381V1063.5H422.5V1027.5Z" stroke="red"/>
-<path id="or-1" fill-rule="evenodd" clip-rule="evenodd" d="M447.5 1027.5H422.5V1071.5H447.5V1027.5Z" stroke="red"/>
+<g id="la-bldg_F2">
+<path id="la_f2_flame" d="M581 1143V1182.5H381V1027.5H581V1143ZM581 1143H564.5" stroke="black"/>
+<path id="la_f2_atrium" fill-rule="evenodd" clip-rule="evenodd" d="M552 1071.5H410V1143H552V1071.5Z" stroke="black"/>
+<path id="hr_2i" fill-rule="evenodd" clip-rule="evenodd" d="M414.5 1182.5H381V1151H414.5V1182.5Z" stroke="black"/>
+<path id="hr_2e" fill-rule="evenodd" clip-rule="evenodd" d="M448 1151H414.5V1182.5H448V1151Z" stroke="black"/>
+<path id="locker-2" fill-rule="evenodd" clip-rule="evenodd" d="M481 1182.5H448V1151H481V1182.5Z" stroke="black"/>
+<path id="hr_2d" fill-rule="evenodd" clip-rule="evenodd" d="M514.5 1182.5H481V1151H514.5V1182.5Z" stroke="black"/>
+<path id="hr_2m" fill-rule="evenodd" clip-rule="evenodd" d="M547.5 1182.5H514.5V1151H547.5V1182.5Z" stroke="black"/>
+<path id="locker-3" fill-rule="evenodd" clip-rule="evenodd" d="M581 1151H547.5V1182.5H581V1151Z" stroke="black"/>
+<path id="wc-women_la_f2" fill-rule="evenodd" clip-rule="evenodd" d="M564.5 1083H581V1107H564.5V1083Z" stroke="black"/>
+<g id="stair_la_f2-f1_east">
+<path id="stair_la_f2-f1_east_flare" fill-rule="evenodd" clip-rule="evenodd" d="M564.5 1107V1115H572.5V1122.5H573.031L574.625 1121L575.687 1120L577.5 1121L576.75 1119L576 1117L577.812 1118L578.875 1117L581 1115V1107H564.5Z" stroke="black"/>
+<path id="stair_la_f2-f1_east_lines" d="M568.5 1115V1107M572.5 1107V1115H581M572.5 1119H576.5" stroke="black" stroke-width="0.5"/>
+</g>
+<g id="stair_la_f2-f3_east">
+<path id="stair_la_f2-f3_east_flame" d="M564.5 1131V1123H572.5L574.625 1121L575.687 1120L577.5 1121L576.75 1119L576 1117L577.812 1118L578.875 1117L581 1115V1131H564.5Z" stroke="black"/>
+<path id="stair_la_f2-f3_east_lines" d="M581 1119H577M581 1123H572.5V1131M568.5 1131V1123" stroke="black" stroke-width="0.5"/>
+</g>
+<g id="stair_la_f2-f3_west">
+<path id="stair_la_f2-f3_west_flame" fill-rule="evenodd" clip-rule="evenodd" d="M398 1099V1107H381V1099L384.375 1096.19L386.5 1097L384.5 1093.5L386.625 1094.31L389.4 1092H390V1099H398Z" stroke="black"/>
+<path id="stair_la_f2-f3_west_lines" d="M390 1095.5H386M381 1099H390V1107M394 1099V1107" stroke="black" stroke-width="0.5"/>
+</g>
+<g id="stair_la_f2-f1_west">
+<path id="stair_la_f2-f1_west_flame" fill-rule="evenodd" clip-rule="evenodd" d="M381 1083.5V1099L383.25 1097.12L384.375 1096.19L386.5 1097L385.5 1095.25L384.5 1093.5L386.625 1094.31L387.187 1093.84L387.75 1093.38L390 1091.5H398V1083.5H381Z" stroke="black"/>
+<path id="stair_la_f2-f1_west_lines" d="M381 1095H385.5M381 1091.5H390V1083.5M394 1083.5V1091.5" stroke="black" stroke-width="0.5"/>
+</g>
+<path id="stg_la_f2_west" fill-rule="evenodd" clip-rule="evenodd" d="M398 1071.5H381V1083.5H398V1071.5Z" stroke="black"/>
+<path id="wc-men_la_f2" fill-rule="evenodd" clip-rule="evenodd" d="M398 1107H381V1131H398V1107Z" stroke="black"/>
+<path id="art-room" fill-rule="evenodd" clip-rule="evenodd" d="M431.5 1063.5H381V1027.5H431.5V1063.5Z" stroke="black"/>
+<path id="to-aet" fill-rule="evenodd" clip-rule="evenodd" d="M448 1063.5H431.5V1027.5H448V1063.5Z" stroke="black"/>
+<path id="po-en" fill-rule="evenodd" clip-rule="evenodd" d="M481 1063.5H448V1027.5H481V1063.5Z" stroke="black"/>
+<path id="pr-en" fill-rule="evenodd" clip-rule="evenodd" d="M514.5 1063.5H481V1027.5H514.5V1063.5Z" stroke="black"/>
+<path id="lang-lab" fill-rule="evenodd" clip-rule="evenodd" d="M564.5 1063.5H514.5V1027.5H564.5V1063.5Z" stroke="black"/>
+<path id="to-pt" fill-rule="evenodd" clip-rule="evenodd" d="M564.5 1071.5V1027.5H581V1071.5H564.5Z" stroke="black"/>
+<path id="sa-balcony" fill-rule="evenodd" clip-rule="evenodd" d="M398 1143H381V1131H398V1143Z" stroke="black"/>
 </g>
 </svg>

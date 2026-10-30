@@ -1,0 +1,198 @@
+/* 重ねたSVGの透明な部分は、下にある建物のタップを遮らないようにします。 */
+.leaflet-overlay-pane > svg,
+.leaflet-floor-maps-pane > svg {
+	pointer-events: none !important;
+}
+
+/* 外枠に重なる部屋の線も、フォーカス中の階の色に揃えます。 */
+.building-floor-focused :where([stroke]:not([stroke='none'])) {
+	stroke: var(--building-outline-color) !important;
+}
+
+.building-floor-outline {
+	stroke-width: 3;
+	stroke-linejoin: round;
+	stroke-dasharray: none;
+	opacity: 1;
+	filter: none;
+	vector-effect: non-scaling-stroke;
+	pointer-events: all !important;
+	cursor: pointer;
+}
+
+.poi-color-start {
+	--poi-highlight-fill: var(--poi-start-fill);
+	--poi-highlight-stroke: var(--poi-start-stroke);
+	--poi-highlight-text: var(--poi-start-text);
+}
+
+.poi-color-goal {
+	--poi-highlight-fill: var(--poi-goal-fill);
+	--poi-highlight-stroke: var(--poi-goal-stroke);
+	--poi-highlight-text: var(--poi-goal-text);
+}
+
+.poi-color-selected {
+	--poi-highlight-fill: var(--poi-selected-fill);
+	--poi-highlight-stroke: var(--poi-selected-stroke);
+	--poi-highlight-text: var(--poi-selected-text);
+}
+
+.poi-selectable,
+.poi-selectable *,
+.building-selectable,
+.building-selectable * {
+	cursor: pointer;
+	/* Leafletのpath設定を上書きし、塗りなしの部屋も内部から選択できます。 */
+	pointer-events: all !important;
+}
+
+.poi-highlight,
+.poi-highlight :is(path, rect, polygon, circle, ellipse, polyline) {
+	fill: var(--poi-highlight-fill, #fbbf24) !important;
+	fill-opacity: 0.6;
+	stroke: var(--poi-highlight-stroke, #b45309) !important;
+	stroke-width: 3;
+	vector-effect: non-scaling-stroke;
+}
+
+.poi-name-tooltip {
+	border: 1px solid var(--poi-highlight-stroke, #b45309);
+	border-radius: 8px;
+	padding: 8px 12px;
+	color: var(--poi-highlight-text, #78350f);
+	font-size: 14px;
+	font-weight: bold;
+	width: max-content;
+	max-width: 240px;
+	white-space: normal;
+	text-align: center;
+}
+
+.poi-name-tooltip.leaflet-tooltip-top::before {
+	border-top-color: var(--poi-highlight-stroke, #b45309);
+}
+
+.facility-marker {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.facility-marker:focus-visible {
+	outline: 3px solid #2563eb;
+	outline-offset: 2px;
+}
+
+.facility-marker-symbol {
+	display: flex;
+	width: 32px;
+	height: 32px;
+	align-items: center;
+	justify-content: center;
+	border: 2px solid #2563eb;
+	border-radius: 50%;
+	background: white;
+	color: #1e40af;
+	box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
+}
+
+.facility-marker-symbol img {
+	width: 24px;
+	height: 24px;
+	object-fit: contain;
+}
+
+.facility-marker-highlight .facility-marker-symbol {
+	border-color: var(--poi-highlight-stroke);
+	background: var(--poi-highlight-fill);
+	color: var(--poi-highlight-text);
+}
+
+.facility-marker-tooltip {
+	border-color: var(--poi-highlight-stroke, #2563eb);
+	color: var(--poi-highlight-text, #1e40af);
+}
+
+.facility-marker-tooltip.leaflet-tooltip-top::before {
+	border-top-color: var(--poi-highlight-stroke, #2563eb);
+}
+
+.route-endpoint-symbol {
+	display: flex;
+	width: 100%;
+	height: 100%;
+	align-items: center;
+	justify-content: center;
+	border: 2px solid white;
+	border-radius: 50%;
+	color: white;
+	font-size: 14px;
+	font-weight: bold;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.route-endpoint-label {
+	border-radius: 6px;
+	padding: 5px 9px;
+	font-size: 12px;
+	font-weight: bold;
+}
+
+.route-endpoint-label,
+.route-transition-label {
+	width: max-content;
+	max-width: var(--route-label-max-width, 240px);
+	white-space: normal;
+	overflow-wrap: anywhere;
+}
+
+.route-label-connector {
+	pointer-events: none !important;
+}
+
+.route-label-displaced::before {
+	display: none;
+}
+
+.route-transition-marker {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 2px solid white;
+	border-radius: 50%;
+	background: #2563eb;
+	color: white;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.route-transition-icon {
+	display: block;
+	width: 22px;
+	height: 22px;
+	fill: none;
+	stroke: currentColor;
+	stroke-width: 2.5;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+}
+
+.route-transition-exit {
+	background: #0f766e;
+}
+
+.route-transition-label {
+	border: 1px solid #2563eb;
+	border-radius: 6px;
+	padding: 6px 10px;
+	color: #1e3a8a;
+	font-size: 13px;
+	font-weight: bold;
+}
+
+.route-transition-label-exit {
+	border-color: #0f766e;
+	color: #115e59;
+}

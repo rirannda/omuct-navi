@@ -1,0 +1,21 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="gym_F1" fill="#ffffff" fill-opacity="0.6">
+<path id="gym_f1_flame" d="M741 1317H954V1453H741V1317Z" stroke="black"/>
+<path id="wc-womens_gym_f1" d="M741 1325H770V1337.5H741V1325Z" stroke="black"/>
+<path id="wc-mens_gym_f1" d="M741 1337.5H770V1349.5H741V1337.5Z" stroke="black"/>
+<path id="shower_gym_f1" d="M741 1349.5H770V1357.5H741V1349.5Z" stroke="black"/>
+<path id="changing-mens_gym_f1" d="M741 1357.5H770V1373H741V1357.5Z" stroke="black"/>
+<path id="entrance_gym_f1" d="M741 1373H770V1405H741V1373Z" stroke="black"/>
+<g id="stair_gym_f1_west">
+<path id="stair_gym_f1_west_flame" d="M741 1405H761.5V1421H741V1405Z" stroke="black"/>
+<path id="stair_gym_f1_west_lines" d="M745 1405V1421M749 1405V1421M753.5 1405V1421M757.5 1405V1421" stroke="black" stroke-width="0.5"/>
+</g>
+<path id="changing-womens_gym_f1" d="M741 1421H770V1437.5H741V1421Z" stroke="black"/>
+<path id="training-room" d="M741 1437.5H770V1453H741V1437.5Z" stroke="black"/>
+<path id="gymnasium" d="M770 1317H933.5V1453H770V1317Z" stroke="black"/>
+<path id="equipment-room_gym_f1-1" d="M933.5 1317H954V1337.5H933.5V1317Z" stroke="black"/>
+<path id="control-room_gym_f1" d="M933.5 1337.5H954V1349.5H933.5V1337.5Z" stroke="black"/>
+<path id="stage_gym_f1" d="M933.5 1349.5H954V1421H933.5V1349.5Z" stroke="black"/>
+<path id="equipment-room_gym_f1-2" d="M933.5 1421H954V1453H933.5V1421Z" stroke="black"/>
+</g>
+</svg>

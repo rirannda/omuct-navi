@@ -4,6 +4,8 @@ on:
   schedule:
     - cron: '0 3 * * 1'
   workflow_dispatch:
+  branch:
+    - 'develop'
 
 permissions:
   contents: write
@@ -19,6 +21,9 @@ jobs:
 
       - name: Update flake.lock
         run: nix flake update
+
+      - name: Update pre-commit
+        run: nix develop
 
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v5

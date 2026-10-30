@@ -1,7 +1,8 @@
-<script>
-	import Map from '$lib/components/Map.svelte';
+<script lang="ts">
+	import { provideNavigation } from '#lib';
+	import OMUCTMap from '#lib/components/Map.svelte';
+
+	const navigation = provideNavigation();
 </script>
 
-<h1>Welcome to SvelteKit</h1>
-<p>Visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to read the documentation</p>
-<Map />
+<OMUCTMap {navigation} />

@@ -1,0 +1,17 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="lib_F2" fill="#ffffff" fill-opacity="0.6">
+<path id="lib_f2_flame" fill-rule="evenodd" clip-rule="evenodd" d="M814 1020H921V1148H873.5H857.5H814L814 1047V1020Z" stroke="black"/>
+<path id="stair_lib_f2-s" d="M857.5 1166V1170.5H873.5V1166M857.5 1166V1161.5M857.5 1166H873.5M873.5 1166V1161.5M873.5 1161.5V1157M873.5 1161.5H857.5M873.5 1157V1152.5M873.5 1157H857.5M873.5 1152.5H857.5M873.5 1152.5V1148H857.5V1152.5M857.5 1152.5V1157M857.5 1157V1161.5" stroke="black"/>
+<path id="wc-mens_lib_f2" fill-rule="evenodd" clip-rule="evenodd" d="M826 1047H814V1020H826V1047Z" stroke="black"/>
+<path id="stg_lib_f2" fill-rule="evenodd" clip-rule="evenodd" d="M834 1020H826V1039.5H834V1020Z" stroke="black"/>
+<path id="stair_lib_f2-n" d="M850 1035.5H834M850 1035.5V1031.5M850 1035.5V1039.5H834V1035.5M834 1035.5V1031.5M834 1031.5H850M834 1031.5V1027M850 1031.5V1027M850 1023V1020H834V1023M850 1023H834M850 1023V1027M834 1023V1027M850 1027H834" stroke="black"/>
+<path id="library-stacks_lib_f2" fill-rule="evenodd" clip-rule="evenodd" d="M869.5 1047V1020H921V1047H869.5Z" stroke="black"/>
+<path id="seminar-room" fill-rule="evenodd" clip-rule="evenodd" d="M865 1097.5L826 1097.5V1148H865.5L865 1097.5Z" stroke="black"/>
+<path id="lecture-hall" fill-rule="evenodd" clip-rule="evenodd" d="M873.5 1148H921V1074L921 1070.5H881V1059H873.5V1074V1148Z" stroke="black"/>
+<path id="control-room" fill-rule="evenodd" clip-rule="evenodd" d="M861.5 1059V1047H921V1070.5H881V1059H861.5Z" stroke="black"/>
+<path id="etiquette-room" fill-rule="evenodd" clip-rule="evenodd" d="M869.5 1020V1047H850V1020H869.5Z" stroke="black"/>
+<path id="balcony_lib_f2" fill-rule="evenodd" clip-rule="evenodd" d="M826 1047H814V1148H826V1047Z" stroke="black"/>
+<path id="special-collections-room" fill-rule="evenodd" clip-rule="evenodd" d="M865 1074H826V1086H865V1074Z" stroke="black"/>
+<path id="industrial-technology-archives" fill-rule="evenodd" clip-rule="evenodd" d="M865 1086H826V1097.5H865V1086Z" stroke="black"/>
+</g>
+</svg>

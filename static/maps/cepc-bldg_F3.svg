@@ -1,0 +1,29 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="cepc-bldg_F3" fill="#ffffff" fill-opacity="0.6">
+<path id="cepc_f3_flame" fill-rule="evenodd" clip-rule="evenodd" d="M967 875V834.5H951.5V805.5H1116V834.5H1108.5V846H1085.5V875H982V889.5H967V875Z" stroke="black"/>
+<path id="lab-measurement-2" fill-rule="evenodd" clip-rule="evenodd" d="M1116 834.5H1093.5V805.5H1116V834.5Z" stroke="black"/>
+<path id="stair_cepc_f3_e" d="M1088 850H1097M1088 850V854M1088 850V846H1097V850M1097 850V854M1097 854H1088M1097 854V858M1088 854V858M1088 858V861H1097V858M1088 858H1097" stroke="black"/>
+<path id="landing_cepc_f2-f3" fill-rule="evenodd" clip-rule="evenodd" d="M982 864H967V871H982V864Z" stroke="black"/>
+<path id="wc-womens_cepc-landing_f2-f3" fill-rule="evenodd" clip-rule="evenodd" d="M974 871H967V882H974V871Z" stroke="black"/>
+<path id="wc-mens_cepc-landing_f2-f3" fill-rule="evenodd" clip-rule="evenodd" d="M982 871H974V882H967V889.5H982V871Z" stroke="black"/>
+<path id="stair_cepc_f3_w" d="M967 857H982M967 857V860.5M967 857V853M982 857V860.5M982 857V853M982 860.5H967M982 860.5V864H974.5M967 860.5V864H974.5M982 853V849H974.5M982 853H974.5M974.5 853V849M974.5 853V864M974.5 853H967M974.5 849H967V853" stroke="black"/>
+<path id="pr-energy-engineering-2" fill-rule="evenodd" clip-rule="evenodd" d="M996.5 845.5H982V875H996.5V845.5Z" stroke="black"/>
+<path id="po-m-sugiura" fill-rule="evenodd" clip-rule="evenodd" d="M1041 845.5H1026.5V875H1041V845.5Z" stroke="black"/>
+<path id="pr-energy-engineering-1" fill-rule="evenodd" clip-rule="evenodd" d="M1026.5 845.5V875H1011.5V845.5H1026.5Z" stroke="black"/>
+<path id="lab-energy-engineering" fill-rule="evenodd" clip-rule="evenodd" d="M1085.5 875H1041V845.5H1085.5V875Z" stroke="black"/>
+<path id="spectroscopy-room-2" fill-rule="evenodd" clip-rule="evenodd" d="M982 820.5H967V805.5H982V820.5Z" stroke="black"/>
+<path id="spectroscopy-room-1" fill-rule="evenodd" clip-rule="evenodd" d="M982 820.5V834.5H951.5V820.5H982Z" stroke="black"/>
+<path id="clean-room" fill-rule="evenodd" clip-rule="evenodd" d="M967 820.5V805.5H951.5V820.5H967Z" stroke="black"/>
+<path id="sample-preparation-room" fill-rule="evenodd" clip-rule="evenodd" d="M1004 824H997V834.5H1004V824Z" stroke="black"/>
+<path id="darkroom" fill-rule="evenodd" clip-rule="evenodd" d="M1011.5 824H1004V834.5H1011.5V824Z" stroke="black"/>
+<path id="structure-analysis-room" fill-rule="evenodd" clip-rule="evenodd" d="M997 805.5H982V834.5H997V824H1011.5V805.5H997Z" stroke="black"/>
+<path id="chemistory-analysis-room" fill-rule="evenodd" clip-rule="evenodd" d="M1026.5 816.5H1011.5V805.5H1026.5V816.5Z" stroke="black"/>
+<path id="pr_cepc_f3" fill-rule="evenodd" clip-rule="evenodd" d="M1011.5 816.5H1026.5V834.5H1011.5V816.5Z" stroke="black"/>
+<path id="icp-room" fill-rule="evenodd" clip-rule="evenodd" d="M1026.5 820.5V805.5H1041.5V820.5H1026.5Z" stroke="black"/>
+<path id="physical-property-evaluation-room" fill-rule="evenodd" clip-rule="evenodd" d="M1056 834.5H1026.5V820.5H1041.5V805.5H1056V834.5Z" stroke="black"/>
+<path id="po-ando" fill-rule="evenodd" clip-rule="evenodd" d="M1071.5 834.5H1056V817H1071.5V834.5Z" stroke="black"/>
+<path id="pr-measurement" fill-rule="evenodd" clip-rule="evenodd" d="M1056 805.5V817H1071.5V805.5H1056Z" stroke="black"/>
+<path id="lab-measurement-1" fill-rule="evenodd" clip-rule="evenodd" d="M1093.5 834.5H1071.5V805.5H1093.5V834.5Z" stroke="black"/>
+<path id="po-m-kamimura" fill-rule="evenodd" clip-rule="evenodd" d="M1011.5 845.5H996.5V875H1011.5V845.5Z" stroke="black"/>
+</g>
+</svg>

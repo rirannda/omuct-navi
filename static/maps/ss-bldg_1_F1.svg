@@ -1,30 +1,30 @@
-<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="ss-bldg_1_F1">
-<path id="flame" fill-rule="evenodd" clip-rule="evenodd" d="M921 929.5H627V836H921V929.5Z" stroke="black"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1700" viewBox="0 0 1400 1700" fill="none">
+<g id="ss-bldg_1_F1" fill="#FFFFFF" fill-opacity="0.6">
+<path id="ss1_f1_flame" fill-rule="evenodd" clip-rule="evenodd" d="M921 929.5H627V836H921V929.5Z" stroke="black"/>
 <path id="startup-ws" fill-rule="evenodd" clip-rule="evenodd" d="M692.5 879H627V929.5H692.5V879Z" stroke="black"/>
-<path id="pr_dyn-des" fill-rule="evenodd" clip-rule="evenodd" d="M839 867.5V836H855.5V867.5H839Z" stroke="black"/>
-<path id="lab_dyn-des" fill-rule="evenodd" clip-rule="evenodd" d="M822.5 867.5H839V836H822.5V867.5Z" stroke="black"/>
-<path id="po_d_furuta" fill-rule="evenodd" clip-rule="evenodd" d="M807 867.5H822.5V836H807V867.5Z" stroke="black"/>
-<path id="lab_data-process-2" fill-rule="evenodd" clip-rule="evenodd" d="M790.5 867.5H807V836H790.5V867.5Z" stroke="black"/>
-<path id="lab_data-process-1" fill-rule="evenodd" clip-rule="evenodd" d="M774 867.5H790.5V836H774V867.5Z" stroke="black"/>
-<path id="lab_pow-elec-ctrl" fill-rule="evenodd" clip-rule="evenodd" d="M758 929.5H692.5V879H758V929.5Z" stroke="black"/>
-<path id="po_e_kawakami" fill-rule="evenodd" clip-rule="evenodd" d="M741.5 897.5V929.5H758V897.5H741.5Z" stroke="black"/>
-<path id="lab_elec-eng" fill-rule="evenodd" clip-rule="evenodd" d="M855.5 929.5H790.5V879H855.5V929.5Z" stroke="black"/>
-<path id="lab_des-eng" fill-rule="evenodd" clip-rule="evenodd" d="M888 879H855.5V910.5H888V879Z" stroke="black"/>
-<path id="stg_ss-bldg-1_f1_east" fill-rule="evenodd" clip-rule="evenodd" d="M912.5 867.5H921V852H912.5V867.5Z" stroke="black"/>
-<path id="stair_ss-bldg-1_f1-f2_east" d="M927.5 889.5H921V865.5H927.5V889.5Z" stroke="black"/>
-<path id="wc_men_ss-bldg-1_f1" fill-rule="evenodd" clip-rule="evenodd" d="M921 836V852H904.5V836H921Z" stroke="black"/>
-<path id="technical_support_office" fill-rule="evenodd" clip-rule="evenodd" d="M904.5 867.5V836H855.5V867.5H904.5Z" stroke="black"/>
-<path id="to_hirai" fill-rule="evenodd" clip-rule="evenodd" d="M888 910.5H855.5V929.5H888V910.5Z" stroke="black"/>
-<path id="po_e_nakatsu" fill-rule="evenodd" clip-rule="evenodd" d="M921 910.5H888V929.5H921V910.5Z" stroke="black"/>
-<path id="lab_add-mfg" fill-rule="evenodd" clip-rule="evenodd" d="M921 910.5H888V879H921V910.5Z" stroke="black"/>
-<path id="lab_visualization" fill-rule="evenodd" clip-rule="evenodd" d="M758 867.5H774V836H758V867.5Z" stroke="black"/>
-<path id="lab_sig-anl" fill-rule="evenodd" clip-rule="evenodd" d="M741.5 867.5H758V836H741.5V867.5Z" stroke="black"/>
-<path id="lab_info-media" fill-rule="evenodd" clip-rule="evenodd" d="M725 867.5H741.5V836H725V867.5Z" stroke="black"/>
-<path id="po_e_enokura" fill-rule="evenodd" clip-rule="evenodd" d="M708.5 867.5H725V836H708.5V867.5Z" stroke="black"/>
-<path id="lab_it" fill-rule="evenodd" clip-rule="evenodd" d="M659.5 867.5H708.5V836H659.5V867.5Z" stroke="black"/>
-<path id="lab_degital-modeling" fill-rule="evenodd" clip-rule="evenodd" d="M627 867.5H659.5V836H627V867.5Z" stroke="black"/>
-<path id="stair_ss-bldg-1_f1-f2_center" d="M782.5 887H774.5V902.5H782.5V887Z" stroke="black"/>
-<path id="stg_ss-bldg-1_f1_center" fill-rule="evenodd" clip-rule="evenodd" d="M766 887H774.5V902.5H782.5V910.5H766V887Z" stroke="black"/>
+<path id="pr-dyn-des" fill-rule="evenodd" clip-rule="evenodd" d="M839 867.5V836H855.5V867.5H839Z" stroke="black"/>
+<path id="lab-dyn-des" fill-rule="evenodd" clip-rule="evenodd" d="M822.5 867.5H839V836H822.5V867.5Z" stroke="black"/>
+<path id="po-d-furuta" fill-rule="evenodd" clip-rule="evenodd" d="M807 867.5H822.5V836H807V867.5Z" stroke="black"/>
+<path id="lab-data-process-2" fill-rule="evenodd" clip-rule="evenodd" d="M790.5 867.5H807V836H790.5V867.5Z" stroke="black"/>
+<path id="lab-data-process-1" fill-rule="evenodd" clip-rule="evenodd" d="M774 867.5H790.5V836H774V867.5Z" stroke="black"/>
+<path id="lab-pow-elec-ctrl" fill-rule="evenodd" clip-rule="evenodd" d="M758 929.5H692.5V879H758V929.5Z" stroke="black"/>
+<path id="po-e-kawakami" fill-rule="evenodd" clip-rule="evenodd" d="M741.5 897.5V929.5H758V897.5H741.5Z" stroke="black"/>
+<path id="lab-elec-eng" fill-rule="evenodd" clip-rule="evenodd" d="M855.5 929.5H790.5V879H855.5V929.5Z" stroke="black"/>
+<path id="lab-des-eng" fill-rule="evenodd" clip-rule="evenodd" d="M888 879H855.5V910.5H888V879Z" stroke="black"/>
+<path id="stg_ss1_f1_east" fill-rule="evenodd" clip-rule="evenodd" d="M912.5 867.5H921V852H912.5V867.5Z" stroke="black"/>
+<path id="stair_ss1_f1-f2_east" d="M933 898.5H921V867.5H933V898.5Z" fill-opacity="1" stroke="black"/>
+<path id="wc-men_ss1_f1" fill-rule="evenodd" clip-rule="evenodd" d="M921 836V852H904.5V836H921Z" stroke="black"/>
+<path id="technical-support-office" fill-rule="evenodd" clip-rule="evenodd" d="M904.5 867.5V836H855.5V867.5H904.5Z" stroke="black"/>
+<path id="to-hirai" fill-rule="evenodd" clip-rule="evenodd" d="M888 910.5H855.5V929.5H888V910.5Z" stroke="black"/>
+<path id="po-m-nakatsu" fill-rule="evenodd" clip-rule="evenodd" d="M921 910.5H888V929.5H921V910.5Z" stroke="black"/>
+<path id="lab-add-mfg" fill-rule="evenodd" clip-rule="evenodd" d="M921 910.5H888V879H921V910.5Z" stroke="black"/>
+<path id="lab-visualization" fill-rule="evenodd" clip-rule="evenodd" d="M758 867.5H774V836H758V867.5Z" stroke="black"/>
+<path id="lab-analize-sig" fill-rule="evenodd" clip-rule="evenodd" d="M741.5 867.5H758V836H741.5V867.5Z" stroke="black"/>
+<path id="lab-info-media" fill-rule="evenodd" clip-rule="evenodd" d="M725 867.5H741.5V836H725V867.5Z" stroke="black"/>
+<path id="po-e-enokura" fill-rule="evenodd" clip-rule="evenodd" d="M708.5 867.5H725V836H708.5V867.5Z" stroke="black"/>
+<path id="lab-info-tech" fill-rule="evenodd" clip-rule="evenodd" d="M659.5 867.5H708.5V836H659.5V867.5Z" stroke="black"/>
+<path id="lab-degital-modeling" fill-rule="evenodd" clip-rule="evenodd" d="M627 867.5H659.5V836H627V867.5Z" stroke="black"/>
+<path id="stair_ss1_f1-f2_center" d="M782.5 887H774.5V902.5H782.5V887Z" stroke="black"/>
+<path id="stg_ss1_f1_center" fill-rule="evenodd" clip-rule="evenodd" d="M766 887H774.5V902.5H782.5V910.5H766V887Z" stroke="black"/>
 </g>
 </svg>

@@ -15,7 +15,7 @@ To recreate this project with the same configuration:
 
 ```sh
 # recreate this project
-bun x sv@0.16.1 create --template minimal --types ts --add prettier eslint vitest="usages:unit,component" tailwindcss="plugins:none" sveltekit-adapter="adapter:cloudflare+cfTarget:pages" --install bun kosen-navi
+bun x sv@0.16.1 create --template minimal --types ts --add prettier eslint vitest="usages:unit,component" tailwindcss="plugins:none" sveltekit-adapter="adapter:cloudflare+cfTarget:pages" --install bun omuct-navi
 ```
 
 ## Developing

@@ -1,0 +1,9 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="skybridge_f1" fill="#ffffff" >
+<path id="skybridge_f1_flame" fill-rule="evenodd" clip-rule="evenodd" d="M614.5 929.5V1094.44V1135V1230.5H674.5V1263.5H664.5V1243.5H614.5V1276.5H589.5V1177.5H581V1129H591.5V1087H581V1069H589.5V929.5H614.5Z" stroke="black"/>
+<g id="stair_skybridge_f1">
+<path id="stair_flame" fill-rule="evenodd" clip-rule="evenodd" d="M614.5 1022.5H629.5V994.5H614.5V1022.5Z" stroke="black"/>
+<path id="lines" d="M614.5 1015.5H629.5M614.5 1008.5H629.5M614.5 1001.5H629.5" stroke="black"/>
+</g>
+</g>
+</svg>

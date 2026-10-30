@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1700" viewBox="0 0 1400 1700" fill="none">
+<g id="ss-bldg_2_F1"  fill="#ffffff" fill-opacity="0.6">
+<path id="ss2_f1_flame" d="M 268 836 H 579 V 921.5 H 268 V 836 Z" stroke="black"/>
+<path id="lab-hydraulic-engineering" d="M 475.5 877 H 579 V 921.5 H 475.5 V 877 Z" stroke="black"/>
+<path id="pr-measurement_ss2_f1" d="M 475.5 884.5 H 491.5 V 914.5 H 475.5 V 884.5 Z" stroke="black"/>
+<path id="po-m-hirabayashi" d="M268 836H284.5V866H268V836Z" stroke="black"/>
+<path id="lab-env-material-chem-1-3" d="M284.5 836H303.5V866H284.5V836Z" stroke="black"/>
+<path id="lab-env-material-chem-1-2" d="M303.5 836H338.5V866H303.5V836Z" stroke="black"/>
+<path id="lab-env-material-biochem" d="M338.5 836H356.5V866H338.5V836Z" stroke="black"/>
+<path id="lab-env-material-chem-1-1" d="M356.5 836H442.5V866H356.5V836Z" stroke="black"/>
+<path id="pr-env-material-chem-1-1" d="M442.5 836H459V866H442.5V836Z" stroke="black"/>
+<path id="wc-mens_ss2_f1" d="M459 836H475.5V851H459V836Z" stroke="black"/>
+<path id="stg_ss2_f1_center" d="M467 851H475.5V866H467V851Z" stroke="black"/>
+<path id="lab-geotech-1" d="M475.5 836H491.5V866H475.5V836Z" stroke="black"/>
+<path id="lab-geotech-2" d="M491.5 836H542V866H491.5V836Z" stroke="black"/>
+<path id="lab-centrifuge" d="M542 836H562.5V866H542V836Z" stroke="black"/>
+<path id="lab-env-health" d="M562.5 836H579V866H562.5V836Z" stroke="black"/>
+<path id="lab-env-material-chem-1-4" d="M268 877H338.5V921.5H268V877Z" stroke="black"/>
+<path id="po-m-kuno" d="M338.5 892H356.5V921.5H338.5V892Z" stroke="black"/>
+<path id="po-m-nishioka" d="M356.5 892H373.5V921.5H356.5V892Z" stroke="black"/>
+<path id="lab-env-material-chem-1-5" d="M338.5 877H373.5V892H338.5V877Z" stroke="black"/>
+<path id="lab-env-material-chem-1-6" d="M373.5 877H408V921.5H373.5V877Z" stroke="black"/>
+<path id="lab-env-material-chem-1-7" d="M 408 877 H 442.5 V 921.5 H 408 V 877 Z" stroke="black"/>
+<path id="electrical-room_ss2_f1" d="M408 877H433.5V892H408V877Z" stroke="black"/>
+<g id="stair_ss2_f1_center">
+<path id="stair_ss2_f1_center_flame" d="M451 884H467.5V907H451V884Z" stroke="black"/>
+<path id="stair_ss2_f1_center_lines" d="M451 888.5H467.5M451 893H467.5M451 898H467.5M451 902.5H467.5" stroke="black" stroke-width="0.5"/>
+</g>
+<g id="stair_ss2_f1_west">
+<path id="stair_ss2_f1_west_flame" d="M256 873.5H268V892.5H256V873.5Z" stroke="black"/>
+<path id="stair_ss2_f1_west_lines" d="M256 878.5H268M256 883H268M256 888H268" stroke="black" stroke-width="0.5"/>
+</g>
+</g>
+</svg>

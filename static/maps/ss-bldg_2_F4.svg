@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="1700" viewBox="0 0 1400 1700" fill="none">
+<g id="ss-bldg_2_F4" fill="#ffffff" fill-opacity="0.6">
+<path id="ss2_f4_flame" d="M 339 836 H 579 V 913.5 H 339 V 836 Z" stroke="black"/>
+<path id="lab-env-material-chem-4-2" d="M 339 836 H 374 V 868.5 H 339 V 836 Z" stroke="black"/>
+<path id="lab-env-material-chem-4-1" d="M 374 836 H 408 V 868.5 H 374 V 836 Z" stroke="black"/>
+<path id="pr-env-material-chem-4-1" d="M 408 836 H 426 V 868.5 H 408 V 836 Z" stroke="black"/>
+<path id="co-env-material-chem" d="M 426 836 H 443 V 868.5 H 426 V 836 Z" stroke="black"/>
+<path id="meeting-room_ss2_f4" d="M 443 836 H 459 V 868.5 H 443 V 836 Z" stroke="black"/>
+<path id="wc-mens_ss2_f4" d="M 459 836 H 475 V 852.5 H 459 V 836 Z" stroke="black"/>
+<path id="stg_ss2_f4_center" d="M 467.5 852.5 H 475 V 868.5 H 467.5 V 852.5 Z" stroke="black"/>
+<path id="po-e-tamura" d="M 475 836 H 491.5 V 868.5 H 475 V 836 Z" stroke="black"/>
+<path id="lecture-social-infrastructure-structure" d="M 491.5 836 H 509 V 868.5 H 491.5 V 836 Z" stroke="black"/>
+<path id="environmental-design-studio" d="M 509 836 H 542 V 868.5 H 509 V 836 Z" stroke="black"/>
+<path id="craft-room" d="M 542 836 H 579 V 868.5 H 542 V 836 Z" stroke="black"/>
+<path id="po-e-noda" d="M 339 881 H 357.5 V 913.5 H 339 V 881 Z" stroke="black"/>
+<path id="lab-env-material-chem-4-3" d="M 357.5 881 H 374 V 913.5 H 357.5 V 881 Z" stroke="black"/>
+<path id="lab-env-material-chem-4-4" d="M 374 881 H 389.5 V 913.5 H 374 V 881 Z" stroke="black"/>
+<path id="po-c-spare-2" d="M 389.5 881 H 408 V 913.5 H 389.5 V 881 Z" stroke="black"/>
+<path id="changing_ss2_f4" d="M 408 881 H 416.5 V 913.5 H 408 V 881 Z" stroke="black"/>
+<path id="po-i-yamano" d="M 416.5 881 H 443 V 913.5 H 416.5 V 881 Z" stroke="black"/>
+<g id="stair_ss2_f4_center">
+<path id="stair_ss2_f4_center_flame" d="M 451.5 889 H 467.5 V 913.5 H 451.5 V 889 Z" stroke="black"/>
+<path id="stair_ss2_f4_center_lines" d="M 451.5 895 H 467.5 M 451.5 901.5 H 467.5 M 451.5 907.5 H 467.5" stroke="black" stroke-width="0.5"/>
+</g>
+<path id="lab-intelligent-information-2" d="M 475 881 H 509 V 913.5 H 475 V 881 Z" stroke="black"/>
+<path id="drafting-room" d="M 509 881 H 579 V 913.5 H 509 V 881 Z" stroke="black"/>
+</g>
+</svg>

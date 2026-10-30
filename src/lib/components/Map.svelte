@@ -1,262 +1,427 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import 'leaflet/dist/leaflet.css';
-	import type * as LType from 'leaflet';
+	import '../map/mapLayers.css';
+	import type * as L from 'leaflet';
+	import { baseMapFiles, buildingMaps } from '../../data/maps';
+	import type { BuildingMap } from '../../data/maps';
+	import type { Node } from '../../data/types';
+	import type { NavigationState, PoiHighlights } from '../states/navigation.svelte';
+	import { highlightColors, highlightRoles } from '../map/highlightColors';
+	import { createConnectedFloorLookup } from '../map/connectedFloors';
+	import { createMapViewState } from '../map/state/view.svelte';
+	import { createSvgLayers, MAP_BOUNDS, MAP_MAX_BOUNDS } from '../map/svgLayers';
+	import { createRouteLayer } from '../map/routeLayer';
+	import { createPoiLayer } from '../map/poiLayer';
+	import { createMarkerLayer } from '../map/markerLayer';
+	import { getNodeBuildingId } from '../map/nodeBuilding';
+	import { getRouteEntryFloors } from '../route/routeFloors';
+	import { layoutFloorControls } from '../map/floorControlLayout';
+	import type { FloorControlPlacement } from '../map/floorControlLayout';
+	import type { LabelBounds } from '../route/labelLayout';
+	import BuildingFloorControls from './BuildingFloorControls.svelte';
+	import BottomSheet, { BOTTOM_SHEET_PEEK_HEIGHT } from './BottomSheet.svelte';
+	import type { BottomSheetSnap } from './BottomSheet.svelte';
+	import RouteSearchPanel from './layout/RouteSearchPanel.svelte';
 
-	let mapContainer: HTMLElement;
-	let map: LType.Map;
+	let { navigation }: { navigation: NavigationState } = $props();
+	const initialNavigation = untrack(() => navigation);
+	const getConnectedFloor = createConnectedFloorLookup(
+		initialNavigation.graph.nodes,
+		initialNavigation.graph.edges
+	);
+	const view = createMapViewState(buildingMaps, getConnectedFloor);
+	let mapContainer: HTMLDivElement;
+	let map: L.Map | undefined;
+	let svgLayers: ReturnType<typeof createSvgLayers> | undefined;
+	let routeLayer: ReturnType<typeof createRouteLayer> | undefined;
+	let poiLayer: ReturnType<typeof createPoiLayer> | undefined;
+	let markerLayer: ReturnType<typeof createMarkerLayer> | undefined;
+	let svgLayersReady = $state(false);
+	let disposed = false;
+	let buildingControlsContainer = $state<HTMLDivElement>();
+	let buildingControlFrame: number | undefined;
+	let routeLabelFrame: number | undefined;
+	let buildingControlPositions = $state<Record<string, FloorControlPlacement>>({});
+	let bottomSheetSnap = $state<BottomSheetSnap>('bottom');
+	let settledSheetSnap = $state<BottomSheetSnap>('bottom');
+	let appliedFocusRequest: NavigationState['focusRequest'] = null;
+	let bottomSheetHeight = $state(BOTTOM_SHEET_PEEK_HEIGHT);
+	let previousSheetSnap: BottomSheetSnap = 'bottom';
+	let previousSheetHeight = BOTTOM_SHEET_PEEK_HEIGHT;
+	let sheetMapOffset = BOTTOM_SHEET_PEEK_HEIGHT / 2;
+	let adjustingSheet = false;
+	let selectedBuildingId: string | undefined;
+	let controlBuildingId = $state<string>();
+	const controlBuildings = $derived(
+		bottomSheetSnap === 'top'
+			? []
+			: view.visibleBuildings.filter(({ id }) => id === controlBuildingId)
+	);
+	let routeBuildings: BuildingMap[] = [];
+	let renderedRoute: readonly string[] | null | undefined;
+	let renderedHighlights: PoiHighlights = {};
 
-	let showBldgMenu = $state(false);
-	let zoomedBldg = $state<'' | 'la' | 'ss1'>('');
-	let activeFloor = $state<'F1' | 'F2' | 'F3' | 'F4'>('F1');
+	$effect(() => {
+		const attempt = navigation.routeErrorVersion;
+		const error = navigation.routeError;
+		if (!attempt || !error || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		const animation = mapContainer.parentElement!.animate(
+			[0, -6, 6, -4, 4, 0].map((x) => ({ transform: `translateX(${x}px)` })),
+			{ duration: 360, easing: 'ease-in-out' }
+		);
+		return () => animation.cancel();
+	});
 
-	let floorLayers: Record<string, LType.Layer> = {};
-	let laBldgFloorLayers: Record<string, LType.Layer> = {};
-	let ssBldg1FloorLayers: Record<string, LType.Layer> = {};
+	$effect(() => {
+		const path = navigation.routePath;
+		const highlights = navigation.highlights;
+		const ready = svgLayersReady;
+		untrack(() => {
+			if (ready) renderNavigation(path, highlights);
+		});
+	});
+	$effect(() => {
+		const snap = bottomSheetSnap;
+		const height = bottomSheetHeight;
+		const ready = svgLayersReady;
+		untrack(() => {
+			if (!ready || (height === previousSheetHeight && snap === previousSheetSnap)) return;
+			previousSheetHeight = height;
+			previousSheetSnap = snap;
+			// 見えている地図の中心を保ち、上の状態では中央以上に地図を動かしません。
+			const offset = Math.round(Math.min(height, map!.getSize().y / 2) / 2);
+			const movement = offset - sheetMapOffset;
+			sheetMapOffset = offset;
+			adjustingSheet = true;
+			try {
+				if (movement) map!.panBy([0, movement], { animate: false });
+				updateDisplays();
+			} finally {
+				adjustingSheet = false;
+			}
+		});
+	});
 
-	const bldgMenuText = {
-		la: { title: '教養棟', floors: 3 },
-		ss1: { title: '専門棟1', floors: 4 }
-	};
+	$effect(() => {
+		const request = navigation.focusRequest;
+		if (request && svgLayersReady && bottomSheetSnap === settledSheetSnap) {
+			untrack(() => {
+				if (request === appliedFocusRequest) return;
+				appliedFocusRequest = request;
+				focusOnPoiId(request.poiId);
+				if (request.showFloor && !navigation.routePath) {
+					const target = navigation.resolvePoi(request.poiId);
+					if (target) {
+						const { buildingId, floor } = target.location;
+						if (
+							'svgId' in target.poi ||
+							buildingMaps.find(({ id }) => id === buildingId)?.floors[floor]
+						)
+							selectBuilding(buildingId);
+					}
+				}
+			});
+		}
+	});
 
-	async function loadSvgOverlay(
-		url: string,
-		bounds: LType.LatLngBoundsExpression,
-		L: typeof LType
-	) {
-		const response = await fetch(url);
-		if (!response.ok) throw new Error(`SVGの取得に失敗しました: ${url}`);
-		const svgText = await response.text();
-		const parser = new DOMParser();
-		const svgDoc = parser.parseFromString(svgText, 'image/svg+xml');
-		const svgElement = svgDoc.documentElement as unknown as SVGElement;
-		return L.svgOverlay(svgElement, bounds, { interactive: true });
+	function renderNavigation(path = navigation.routePath, highlights = navigation.highlights) {
+		if (!svgLayersReady || disposed) return;
+		const routeChanged = path !== renderedRoute;
+		let routeStart: Node | undefined;
+		if (routeChanged) {
+			renderedRoute = path;
+			controlBuildingId = path ? undefined : selectedBuildingId;
+			const entryFloors = path ? getRouteEntryFloors(path, navigation.graph.nodes) : {};
+			routeBuildings = buildingMaps.filter(({ id }) => entryFloors[id] !== undefined);
+			if (path) {
+				routeStart = routeLayer!.draw(path);
+			} else routeLayer!.clear();
+		}
+		for (const role of highlightRoles) {
+			const id = highlights[role];
+			if (!id || id === renderedHighlights[role]) continue;
+			const target = navigation.resolvePoi(id);
+			if (target && (poiLayer!.findTarget(id) || markerLayer!.has(id))) {
+				const { buildingId, floor } = target.location;
+				if (view.visibleBuildings.some(({ id }) => id === buildingId)) {
+					switchFloor(buildingId, floor);
+				}
+			}
+		}
+		if (routeChanged && path && routeStart) {
+			view.selectRouteFloors(getRouteEntryFloors(path, navigation.graph.nodes));
+		}
+		if (routeChanged) {
+			setVisibleBuildings();
+			updateDisplays();
+			if (routeStart) routeLayer!.fitFloor(routeStart.floor);
+		}
+		renderedHighlights = highlights;
+		poiLayer!.render(highlights);
+		markerLayer!.render(highlights);
+		scheduleBuildingControls();
+		scheduleRouteLabels();
 	}
 
-	function switchFloor(bldg: string, floor: 'F1' | 'F2' | 'F3' | 'F4') {
-		if (!map || activeFloor === floor) return;
+	function scheduleBuildingControls() {
+		if (disposed || !svgLayersReady || buildingControlFrame !== undefined) return;
+		buildingControlFrame = requestAnimationFrame(() => {
+			buildingControlFrame = undefined;
+			updateBuildingControls();
+		});
+	}
+	function scheduleRouteLabels() {
+		if (disposed || !svgLayersReady || routeLabelFrame !== undefined) return;
+		routeLabelFrame = requestAnimationFrame(() => {
+			routeLabelFrame = undefined;
+			routeLayer?.updateLabels();
+		});
+	}
+	function updateBuildingControls() {
+		if (!map || !svgLayers || !buildingControlsContainer) return;
+		const size = map.getSize();
+		const visibleHeight = Math.max(0, size.y - bottomSheetHeight);
+		const containerRect = mapContainer.getBoundingClientRect();
+		const obstacles: LabelBounds[] = Array.from(
+			mapContainer.querySelectorAll('.leaflet-control, .poi-name-tooltip')
+		).map((element) => {
+			const rect = element.getBoundingClientRect();
+			return {
+				x: rect.left - containerRect.left,
+				y: rect.top - containerRect.top,
+				width: rect.width,
+				height: rect.height
+			};
+		});
+		const buildings = svgLayers!.getControlBuildings(view.activeFloors);
+		const controls = controlBuildings.flatMap(({ id }) => {
+			const panel = buildingControlsContainer!.querySelector<HTMLElement>(
+				`[data-building="${id}"]`
+			);
+			return panel && panel.offsetHeight + 16 <= visibleHeight
+				? [
+						{
+							id,
+							width: panel.offsetWidth,
+							height: panel.offsetHeight,
+							previousSide: buildingControlPositions[id]?.side
+						}
+					]
+				: [];
+		});
+		const positions = layoutFloorControls(
+			controls,
+			buildings,
+			{ width: size.x, height: visibleHeight },
+			obstacles
+		);
+		buildingControlPositions = Object.fromEntries(
+			positions.map((position) => [position.id, position])
+		);
+		scheduleRouteLabels();
+	}
 
-		if (floorLayers[activeFloor] && map.hasLayer(floorLayers[activeFloor])) {
-			floorLayers[activeFloor].remove();
+	function setVisibleBuildings() {
+		const buildings = navigation.routePath
+			? routeBuildings
+			: buildingMaps.filter(({ id }) => id === selectedBuildingId);
+		view.setVisibleBuildings(buildings, false);
+		scheduleBuildingControls();
+	}
+	function selectBuilding(buildingId: string) {
+		if (navigation.routePath) {
+			if (!routeBuildings.some(({ id }) => id === buildingId)) return;
+		} else selectedBuildingId = buildingId;
+		controlBuildingId = buildingId;
+		setVisibleBuildings();
+		updateDisplays();
+	}
+	function onMapClick(event: L.LeafletMouseEvent) {
+		const target = event.originalEvent.target;
+		if (
+			target instanceof Element &&
+			target.closest('[data-map-building], .route-transition-marker, .facility-marker')
+		)
+			return;
+		if (!navigation.routePath) selectedBuildingId = undefined;
+		controlBuildingId = undefined;
+		setVisibleBuildings();
+		updateDisplays();
+	}
+	function updateDisplays() {
+		if (disposed || !svgLayersReady) return;
+		svgLayers!.updateVisible(view.visibleBuildings, view.activeFloors, view.buildingOutlineColors);
+		poiLayer!.updateVisible();
+		markerLayer!.updateVisible();
+		routeLayer!.updateVisible();
+		scheduleBuildingControls();
+		scheduleRouteLabels();
+	}
+	function updateMapState() {
+		if (disposed || !svgLayersReady || adjustingSheet) return;
+		updateDisplays();
+	}
+	function switchFloor(buildingId: string, floor: number) {
+		if (!map) return;
+		view.selectFloor(buildingId, floor);
+		view.synchronize(buildingId);
+		updateDisplays();
+	}
+	function focusOnLocation(x: number, y: number, zoom = 3) {
+		if (!map) {
+			console.error('マップが初期化されていません');
+			return;
 		}
-
-		activeFloor = floor;
-
-		if (floorLayers[activeFloor]) {
-			floorLayers[activeFloor].addTo(map);
+		const targetZoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), zoom));
+		const center = map.project([y, x], targetZoom).add([0, bottomSheetHeight / 2]);
+		map.flyTo(map.unproject(center, targetZoom), targetZoom, { duration: 1 });
+	}
+	export function focusOnPoiId(poiId: string) {
+		const target = navigation.resolvePoi(poiId);
+		if (!target) {
+			console.error(`POIまたはノードが見つかりません: ${poiId}`);
+			return;
 		}
+		const { buildingId, floor, x, y } = target.location;
+		switchFloor(buildingId, floor);
+		focusOnLocation(x, y, 2);
 	}
 
 	onMount(() => {
-		const initMap = async () => {
-			const L = await import('leaflet');
-
-			const bounds: LType.LatLngBoundsExpression = [
-				[0, 0],
-				[1700, 1400]
-			];
-
-			map = L.map(mapContainer, {
-				crs: L.CRS.Simple,
-				minZoom: -1,
-				maxZoom: 2,
-				zoomControl: true,
-				maxBounds: bounds,
-				maxBoundsViscosity: 1.0
-			});
-
-			const laBldgBounds = L.latLngBounds([
-				[672.5, 381],
-				[517, 581]
-			]);
-			const ssBldg1Bounds = L.latLngBounds([
-				[864, 627],
-				[770.5, 921]
-			]);
-			const SHOW_UI_ZOOM_THRESHOLD = 1;
-
+		for (const [role, colors] of Object.entries(highlightColors)) {
+			for (const [property, value] of Object.entries(colors))
+				mapContainer.style.setProperty(`--poi-${role}-${property}`, value);
+		}
+		async function initMap() {
 			try {
-				// svgを並列読み込み
-				const [
-					masterLayer,
-					laBldgF1Layer,
-					laBldgF2Layer,
-					laBldgF3Layer,
-					ssBldg1F1Layer,
-					ssBldg1F2Layer,
-					ssBldg1F3Layer,
-					ssBldg1F4Layer
-				] = await Promise.all([
-					loadSvgOverlay('/maps/master.svg', bounds, L),
-					loadSvgOverlay('/maps/la-bldg_F1.svg', bounds, L),
-					loadSvgOverlay('/maps/la-bldg_F2.svg', bounds, L), // placeholder
-					loadSvgOverlay('/maps/la-bldg_F3.svg', bounds, L), // placeholder
-					loadSvgOverlay('/maps/ss-bldg_1_F1.svg', bounds, L),
-					loadSvgOverlay('/maps/ss-bldg_1_F2.svg', bounds, L),
-					loadSvgOverlay('/maps/ss-bldg_1_F3.svg', bounds, L),
-					loadSvgOverlay('/maps/ss-bldg_1_F4.svg', bounds, L)
-				]);
-
-				masterLayer.addTo(map);
-
-				// 位置確認用マーカー
-				let marker = L.marker([864, 627]);
-				marker.addTo(map);
-				marker = L.marker([864, 921]);
-				marker.addTo(map);
-				marker = L.marker([770.5, 627]);
-				marker.addTo(map);
-				marker = L.marker([770.5, 921]);
-				marker.addTo(map);
-
-				laBldgFloorLayers['F1'] = laBldgF1Layer;
-				laBldgFloorLayers['F2'] = laBldgF2Layer;
-				laBldgFloorLayers['F3'] = laBldgF3Layer;
-				ssBldg1FloorLayers['F1'] = ssBldg1F1Layer;
-				ssBldg1FloorLayers['F2'] = ssBldg1F2Layer;
-				ssBldg1FloorLayers['F3'] = ssBldg1F3Layer;
-				ssBldg1FloorLayers['F4'] = ssBldg1F4Layer;
-
-				const updateMapState = () => {
-					const currentZoom = map.getZoom();
-					const mapCenter = map.getCenter();
-
-					const isZoomedIn = currentZoom >= SHOW_UI_ZOOM_THRESHOLD;
-
-					// 画面の中心が建物の領域内にあるか判定
-					// 建物のBoundsを20%拡張した範囲を中心に設定
-					const isLaBldgInCenter = laBldgBounds.pad(0.2).contains(mapCenter);
-					const isSsBldg1InCenter = ssBldg1Bounds.pad(0.2).contains(mapCenter);
-
-					if (isZoomedIn && isLaBldgInCenter) {
-						zoomedBldg = 'la';
-						floorLayers = laBldgFloorLayers;
-					} else if (isZoomedIn && isSsBldg1InCenter) {
-						zoomedBldg = 'ss1';
-						floorLayers = ssBldg1FloorLayers;
-					} else {
-						zoomedBldg = '';
+				const leaflet = await import('leaflet');
+				if (disposed) return;
+				const mountedMap = leaflet.map(mapContainer, {
+					crs: leaflet.CRS.Simple,
+					minZoom: -2,
+					maxZoom: 2,
+					zoomControl: true,
+					maxBounds: MAP_MAX_BOUNDS,
+					maxBoundsViscosity: 1
+				});
+				map = mountedMap;
+				for (const [name, zIndex] of [
+					['floor-maps', 420],
+					['route-lines', 430]
+				] as const) {
+					mountedMap.createPane(name).style.zIndex = String(zIndex);
+				}
+				svgLayers = createSvgLayers(
+					leaflet,
+					mountedMap,
+					mapContainer,
+					buildingMaps,
+					baseMapFiles,
+					selectBuilding
+				);
+				routeLayer = createRouteLayer(
+					leaflet,
+					mountedMap,
+					mapContainer,
+					navigation.graph.nodes,
+					() => view,
+					(node) => {
+						switchFloor(getNodeBuildingId(node) || view.zoomedBldg, node.floor);
+						focusOnLocation(node.x, node.y, Math.max(0, mountedMap.getZoom()));
+					},
+					navigation.graph.edges,
+					() => Math.max(0, mountedMap.getSize().y - bottomSheetHeight)
+				);
+				poiLayer = createPoiLayer(
+					leaflet,
+					mountedMap,
+					mapContainer,
+					svgLayers,
+					navigation.graph.nodes,
+					navigation.pois,
+					(poiId) => {
+						navigation.setHighlight(poiId);
 					}
-					showBldgMenu = isZoomedIn && zoomedBldg != '';
-
-					if (showBldgMenu) {
-						if (floorLayers[activeFloor] && !map.hasLayer(floorLayers[activeFloor])) {
-							floorLayers[activeFloor].addTo(map);
-						}
-					} else {
-						if (floorLayers['F1'] && map.hasLayer(floorLayers['F1'])) floorLayers['F1'].remove();
-						if (floorLayers['F2'] && map.hasLayer(floorLayers['F2'])) floorLayers['F2'].remove();
-						if (floorLayers['F3'] && map.hasLayer(floorLayers['F3'])) floorLayers['F3'].remove();
-						if (floorLayers['F4'] && map.hasLayer(floorLayers['F4'])) floorLayers['F4'].remove();
-					}
-				};
-
-				map.on('zoomend moveend', updateMapState);
-				map.fitBounds(bounds);
+				);
+				const selections = await svgLayers.load();
+				if (disposed) return;
+				markerLayer = createMarkerLayer(
+					leaflet,
+					mountedMap,
+					navigation.markers.filter(({ id }) => navigation.resolvePoi(id)),
+					buildingMaps,
+					() => view,
+					(id) => navigation.setHighlight(id)
+				);
+				for (const { layer, buildingId, floor } of selections)
+					poiLayer.enableSelection(layer, buildingId, floor);
+				svgLayersReady = true;
+				mountedMap.on('click', onMapClick);
+				mountedMap.on('move zoom resize zoomend moveend', updateMapState);
+				mountedMap.on('move zoom resize tooltipopen tooltipclose', scheduleRouteLabels);
+				mountedMap.fitBounds(MAP_BOUNDS);
 				updateMapState();
+				renderNavigation();
 			} catch (error) {
-				console.error('マップの初期化エラー:', error);
+				if (!disposed) console.error('マップの初期化エラー:', error);
 			}
-		};
-
-		initMap();
-
+		}
+		void initMap();
 		return () => {
-			if (map) map.remove();
+			disposed = true;
+			svgLayersReady = false;
+			if (buildingControlFrame !== undefined) cancelAnimationFrame(buildingControlFrame);
+			if (routeLabelFrame !== undefined) cancelAnimationFrame(routeLabelFrame);
+			map?.off('move zoom resize zoomend moveend', updateMapState);
+			map?.off('click', onMapClick);
+			map?.off('move zoom resize tooltipopen tooltipclose', scheduleRouteLabels);
+			poiLayer?.dispose();
+			markerLayer?.dispose();
+			routeLayer?.dispose();
+			svgLayers?.dispose();
+			if (map) {
+				const mountedMap = map;
+				if (mapContainer.querySelector('.leaflet-zoom-anim'))
+					mountedMap.once('zoomend', () => mountedMap.remove());
+				else mountedMap.remove();
+			}
 		};
 	});
 </script>
 
-<div class="map-wrapper">
-	<div bind:this={mapContainer} class="map-container"></div>
-
-	{#if showBldgMenu && zoomedBldg != ''}
-		<div class="custom-control-panel">
-			<h3>{bldgMenuText[zoomedBldg].title}</h3>
-			<div class="floor-buttons">
-				{#if bldgMenuText[zoomedBldg].floors == 4}
-					<button class:active={activeFloor === 'F4'} onclick={() => switchFloor(zoomedBldg, 'F4')}>
-						4F
-					</button>
-					<button class:active={activeFloor === 'F3'} onclick={() => switchFloor(zoomedBldg, 'F3')}>
-						3F
-					</button>
-				{/if}
-				{#if bldgMenuText[zoomedBldg].floors == 3}
-					<button class:active={activeFloor === 'F3'} onclick={() => switchFloor(zoomedBldg, 'F3')}>
-						3F
-					</button>
-				{/if}
-				<button class:active={activeFloor === 'F2'} onclick={() => switchFloor(zoomedBldg, 'F2')}>
-					2F
-				</button>
-				<button class:active={activeFloor === 'F1'} onclick={() => switchFloor(zoomedBldg, 'F1')}>
-					1F
-				</button>
-			</div>
-		</div>
-	{/if}
+<div
+	class={[
+		'map-wrapper relative isolate h-dvh w-full overflow-hidden [&_.leaflet-bottom.leaflet-right]:bottom-(--bottom-sheet-height)! [&_.leaflet-control-attribution]:mr-2!',
+		bottomSheetSnap === 'top' && 'sheet-expanded'
+	]}
+	style:--bottom-sheet-height={`${bottomSheetHeight}px`}
+>
+	<div bind:this={mapContainer} class="map-container z-1 h-full w-full bg-[#898989]!"></div>
+	<BuildingFloorControls
+		buildings={controlBuildings}
+		positions={buildingControlPositions}
+		colors={view.buildingOutlineColors}
+		activeFloors={view.activeFloors}
+		onfloorchange={switchFloor}
+		onresize={scheduleBuildingControls}
+		bind:container={buildingControlsContainer}
+	/>
+	<BottomSheet
+		bind:snap={bottomSheetSnap}
+		onheightchange={(height) => (bottomSheetHeight = height)}
+		onsettle={(snap, height) => {
+			bottomSheetHeight = height;
+			settledSheetSnap = snap;
+		}}
+	>
+		<RouteSearchPanel {navigation} bind:snap={bottomSheetSnap} />
+	</BottomSheet>
 </div>
 
 <style>
-	.map-wrapper {
-		position: relative;
-		width: 100%;
-		height: 600px;
-		border-radius: 8px;
-		overflow: hidden;
-	}
-
-	.map-container {
-		width: 100%;
-		height: 100%;
-		background-color: #f0f0f0;
-		z-index: 1;
-	}
-
-	.custom-control-panel {
-		position: absolute;
-		top: 20px;
-		right: 20px;
-		z-index: 1000;
-		background: rgba(255, 255, 255, 0.95);
-		padding: 16px;
-		border-radius: 12px;
-		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-		backdrop-filter: blur(4px);
-		transition: opacity 0.3s ease;
-	}
-
-	.custom-control-panel h3 {
-		margin: 0 0 12px 0;
-		font-size: 14px;
-		color: #333;
-		text-align: center;
-	}
-
-	.floor-buttons {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-	}
-
-	.floor-buttons button {
-		padding: 8px 24px;
-		border: 1px solid #ccc;
-		background: white;
-		border-radius: 6px;
-		cursor: pointer;
-		font-weight: bold;
-		transition: all 0.2s;
-	}
-
-	.floor-buttons button:hover {
-		background: #f8f9fa;
-	}
-
-	.floor-buttons button.active {
-		background: #007bff;
-		color: white;
-		border-color: #007bff;
+	.sheet-expanded :global(.leaflet-control) {
+		visibility: hidden;
+		pointer-events: none;
 	}
 </style>

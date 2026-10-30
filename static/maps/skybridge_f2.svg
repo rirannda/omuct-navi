@@ -1,0 +1,14 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="skybridge_f2" fill="#ffffff" >
+<path id="skybridge_f2_flame" fill-rule="evenodd" clip-rule="evenodd" d="M592 889.5H579V929.5H589.5V1069H581V1087H591.5V1129H581V1168H589.5V1276.5H643.5V1268.5H614.5V1135H687V1094.5H614.5V929.5H627V889.5H609V913.5L605 917H596L592 913V889.5Z" stroke="black"/>
+<path id="stair_skybridge_f2_la-s" d="M585 1129H581V1168H585M585 1129V1168M585 1129H589M585 1168H589M589 1168H591.5V1129H589M589 1168V1129" stroke="black"/>
+<path id="stair_skybridge_f2_la-n" d="M584 1087V1075.5M584 1087H588M584 1087H581V1075.5H584M584 1075.5H588M588 1075.5V1087M588 1075.5H591.5V1087H588" stroke="black"/>
+<path id="slope_skybridge_f2_la-n" fill-rule="evenodd" clip-rule="evenodd" d="M589.5 1069H581V1075.5H597.5V1043.5H589.5V1069Z" stroke="black"/>
+<path id="stair_skybridge_clock" d="M683.5 1094.5H687V1135H683.5M683.5 1094.5H679.5M683.5 1094.5V1135M683.5 1135H679.5M679.5 1135V1094.5M679.5 1135H675.5M679.5 1094.5H675.5M675.5 1135V1094.5M675.5 1135H671.5M675.5 1094.5H671.5M671.5 1094.5H667.5V1135H671.5M671.5 1094.5V1135" stroke="black"/>
+<path id="clock" fill-rule="evenodd" clip-rule="evenodd" d="M662 1106H629V1123H662V1106Z" stroke="black"/>
+<g id="stair_skybridge_f2">
+<path id="stair_flame" fill-rule="evenodd" clip-rule="evenodd" d="M614.5 1022.5H629.5V994.5H614.5V1022.5Z" stroke="black"/>
+<path id="lines" d="M614.5 1015.5H629.5M614.5 1008.5H629.5M614.5 1001.5H629.5" stroke="black"/>
+</g>
+</g>
+</svg>

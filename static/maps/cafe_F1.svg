@@ -1,0 +1,9 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="cafe_F1" fill="#ffffff" fill-opacity="0.6">
+<path id="cafe_f1_flame" fill-rule="evenodd" clip-rule="evenodd" d="M832.5 1272H757.5V1244.5H748V1195H832.5V1272Z" stroke="black"/>
+<path id="vending-machine-corner" fill-rule="evenodd" clip-rule="evenodd" d="M757.5 1263H748V1277H757.5V1263Z" stroke="black"/>
+<path id="dining-hall" fill-rule="evenodd" clip-rule="evenodd" d="M832.5 1244.5H748V1195H832.5V1244.5Z" stroke="black"/>
+<path id="wc-men_cafe_f1" fill-rule="evenodd" clip-rule="evenodd" d="M757.5 1258.5V1244.5H776V1258.5H757.5Z" stroke="black"/>
+<path id="kitchen" fill-rule="evenodd" clip-rule="evenodd" d="M757.5 1272V1258.5H776V1244.5H832.5V1272H757.5Z" stroke="black"/>
+</g>
+</svg>

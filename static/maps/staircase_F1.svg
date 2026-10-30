@@ -1,0 +1,11 @@
+<svg width="1400" height="1700" viewBox="0 0 1400 1700" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="staircase-f1">
+<path id="staircase_f1_flame" fill-rule="evenodd" clip-rule="evenodd" d="M627 929.5H579V836H627V929.5Z" stroke="black"/>
+<g id="stair_staircase_f1">
+<path id="stair_flame" fill-rule="evenodd" clip-rule="evenodd" d="M600.5 868H592V852H600.5V868Z" stroke="black"/>
+<path id="lines" d="M592 864H600.5M592 860H600.5M592 856H600.5" stroke="black"/>
+</g>
+<path id="stg_staircase_f1" fill-rule="evenodd" clip-rule="evenodd" d="M592 844V852H600.5V868H609V844H592Z" stroke="black"/>
+<path id="wc-men_staircase_f1" fill-rule="evenodd" clip-rule="evenodd" d="M592 905V880.5H609V905H592Z" stroke="black"/>
+</g>
+</svg>
