@@ -35,9 +35,9 @@ describe('BottomSheet', () => {
 		expect(handle.getAttribute('aria-expanded')).toBe('false');
 		const button = getByRole('button', { name: 'ボトムシートの高さを変更' });
 		await button.click();
-		await expect.poll(() => sheet.getBoundingClientRect().height).toBeCloseTo(784 / 3, 1);
+		await expect.poll(() => sheet.getBoundingClientRect().height).toBeCloseTo(470.4, 1);
 		expect(sheet.dataset.snap).toBe('middle');
-		await expect.poll(() => onsettle.mock.lastCall).toEqual(['middle', 784 / 3]);
+		await expect.poll(() => onsettle.mock.lastCall).toEqual(['middle', 470.4]);
 		expect(handle.getAttribute('aria-expanded')).toBe('true');
 		await button.click();
 		await expect.poll(() => sheet.getBoundingClientRect().height).toBe(784);
@@ -57,7 +57,7 @@ describe('BottomSheet', () => {
 		expect(onheightchange).toHaveBeenLastCalledWith(424);
 		pointer(handle, 'pointerup', 440, 700);
 		handle.click();
-		await expect.poll(() => sheet.getBoundingClientRect().height).toBeCloseTo(784 / 3, 1);
+		await expect.poll(() => sheet.getBoundingClientRect().height).toBeCloseTo(470.4, 1);
 		expect(sheet.dataset.snap).toBe('middle');
 		pointer(handle, 'pointerdown', 440, 800);
 		pointer(handle, 'pointermove', 0, 1200);
@@ -86,9 +86,14 @@ describe('BottomSheet', () => {
 		const { container, sheet, getByRole } = await renderSheet();
 		const button = getByRole('button', { name: 'ボトムシートの高さを変更' });
 		await button.click();
-		await expect.poll(() => sheet.getBoundingClientRect().height).toBeCloseTo(784 / 3, 1);
+		await expect.poll(() => sheet.getBoundingClientRect().height).toBeCloseTo(470.4, 1);
 		container.style.height = '600px';
-		await expect.poll(() => sheet.getBoundingClientRect().height).toBeCloseTo(584 / 3, 1);
+		await expect.poll(() => sheet.getBoundingClientRect().height).toBe(384);
+		container.style.height = '360px';
+		await expect.poll(() => sheet.getBoundingClientRect().height).toBe(344);
+		expect(sheet.dataset.snap).toBe('middle');
+		container.style.height = '600px';
+		await expect.poll(() => sheet.getBoundingClientRect().height).toBe(384);
 		await button.click();
 		await expect.poll(() => sheet.getBoundingClientRect().height).toBe(584);
 		await button.click();

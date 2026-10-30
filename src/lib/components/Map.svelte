@@ -13,6 +13,7 @@
 	import { createSvgLayers, MAP_BOUNDS, MAP_MAX_BOUNDS } from '../map/svgLayers';
 	import { createRouteLayer } from '../map/routeLayer';
 	import { createPoiLayer } from '../map/poiLayer';
+	import { createMarkerLayer } from '../map/markerLayer';
 	import { getNodeBuildingId } from '../map/nodeBuilding';
 	import { getRouteEntryFloors } from '../route/routeFloors';
 	import { layoutFloorControls } from '../map/floorControlLayout';
@@ -35,6 +36,7 @@
 	let svgLayers: ReturnType<typeof createSvgLayers> | undefined;
 	let routeLayer: ReturnType<typeof createRouteLayer> | undefined;
 	let poiLayer: ReturnType<typeof createPoiLayer> | undefined;
+	let markerLayer: ReturnType<typeof createMarkerLayer> | undefined;
 	let svgLayersReady = $state(false);
 	let disposed = false;
 	let buildingControlsContainer = $state<HTMLDivElement>();
@@ -110,7 +112,14 @@
 				focusOnPoiId(request.poiId);
 				if (request.showFloor && !navigation.routePath) {
 					const target = navigation.resolvePoi(request.poiId);
-					if (target) selectBuilding(getNodeBuildingId(target.node));
+					if (target) {
+						const { buildingId, floor } = target.location;
+						if (
+							'svgId' in target.poi ||
+							buildingMaps.find(({ id }) => id === buildingId)?.floors[floor]
+						)
+							selectBuilding(buildingId);
+					}
 				}
 			});
 		}
@@ -133,10 +142,10 @@
 			const id = highlights[role];
 			if (!id || id === renderedHighlights[role]) continue;
 			const target = navigation.resolvePoi(id);
-			if (target && poiLayer!.findTarget(id)) {
-				const buildingId = getNodeBuildingId(target.node);
+			if (target && (poiLayer!.findTarget(id) || markerLayer!.has(id))) {
+				const { buildingId, floor } = target.location;
 				if (view.visibleBuildings.some(({ id }) => id === buildingId)) {
-					switchFloor(buildingId, target.node.floor);
+					switchFloor(buildingId, floor);
 				}
 			}
 		}
@@ -150,6 +159,7 @@
 		}
 		renderedHighlights = highlights;
 		poiLayer!.render(highlights);
+		markerLayer!.render(highlights);
 		scheduleBuildingControls();
 		scheduleRouteLabels();
 	}
@@ -231,7 +241,7 @@
 		const target = event.originalEvent.target;
 		if (
 			target instanceof Element &&
-			target.closest('[data-map-building], .route-transition-marker')
+			target.closest('[data-map-building], .route-transition-marker, .facility-marker')
 		)
 			return;
 		if (!navigation.routePath) selectedBuildingId = undefined;
@@ -243,6 +253,7 @@
 		if (disposed || !svgLayersReady) return;
 		svgLayers!.updateVisible(view.visibleBuildings, view.activeFloors, view.buildingOutlineColors);
 		poiLayer!.updateVisible();
+		markerLayer!.updateVisible();
 		routeLayer!.updateVisible();
 		scheduleBuildingControls();
 		scheduleRouteLabels();
@@ -272,8 +283,9 @@
 			console.error(`POIまたはノードが見つかりません: ${poiId}`);
 			return;
 		}
-		switchFloor(getNodeBuildingId(target.node), target.node.floor);
-		focusOnLocation(target.node.x, target.node.y, 2);
+		const { buildingId, floor, x, y } = target.location;
+		switchFloor(buildingId, floor);
+		focusOnLocation(x, y, 2);
 	}
 
 	onMount(() => {
@@ -334,6 +346,14 @@
 				);
 				const selections = await svgLayers.load();
 				if (disposed) return;
+				markerLayer = createMarkerLayer(
+					leaflet,
+					mountedMap,
+					navigation.markers.filter(({ id }) => navigation.resolvePoi(id)),
+					buildingMaps,
+					() => view,
+					(id) => navigation.setHighlight(id)
+				);
 				for (const { layer, buildingId, floor } of selections)
 					poiLayer.enableSelection(layer, buildingId, floor);
 				svgLayersReady = true;
@@ -357,6 +377,7 @@
 			map?.off('click', onMapClick);
 			map?.off('move zoom resize tooltipopen tooltipclose', scheduleRouteLabels);
 			poiLayer?.dispose();
+			markerLayer?.dispose();
 			routeLayer?.dispose();
 			svgLayers?.dispose();
 			if (map) {

@@ -10,6 +10,7 @@
 | `src/lib/map/state/floors.ts`                     | 公開階への補正と接続先への階の同期。入力を変更しない純粋関数                     |
 | `src/lib/map/svgLayers.ts`                        | SVGの取得・検索、基本図・全体図・階別図の表示、画面上の建物形状への変換          |
 | `src/lib/map/poiLayer.ts`                         | POIの操作イベント、強調表示、吹き出し、イベントと表示資源の破棄                  |
+| `src/lib/map/markerLayer.ts`                      | SVG図形を使わない施設アイコン、選択・役割別の強調、階別表示、表示資源の破棄      |
 | `src/lib/map/routeLayer.ts`                       | 経路線、始終点・階移動マーカー、ラベル配置、表示資源の破棄                       |
 | `src/lib/components/BuildingFloorControls.svelte` | 階操作パネルと接続線、サイズ変更と階変更の通知                                   |
 

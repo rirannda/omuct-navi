@@ -1,6 +1,8 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { createNavigationState } from '../navigation.svelte';
 import type { NavigationData } from '../navigation.svelte';
+import type { MapMarker } from '../../../data/types';
+import toiletIcon from '../../assets/markers/toilet-men.svg';
 
 const data: NavigationData = {
 	graph: {
@@ -22,6 +24,63 @@ afterEach(() => {
 });
 
 describe('navigation state', () => {
+	const marker: MapMarker = {
+		id: 'marker-toilet',
+		name: '管理棟のトイレ',
+		categoryId: 'toilet',
+		nodeId: 'b',
+		description: '2階、入口から右',
+		icon: toiletIcon,
+		buildingId: 'admin',
+		floor: 2,
+		x: 100,
+		y: 200
+	};
+
+	it('別管理のマーカーを選択・検索・経路の共通対象とし、表示位置をノードと分離する', () => {
+		const state = createNavigationState({ ...data, markers: [marker] });
+		expect(state.pois).toEqual(data.pois);
+		expect(state.markers).toEqual([marker]);
+		expect(state.destinations).toEqual([...data.pois, marker]);
+		expect(state.setHighlight(marker.id)).toBe(true);
+		expect(state.selectedPoi).toEqual(marker);
+		expect(state.resolvePoi(marker.id)?.location).toEqual({
+			x: 100,
+			y: 200,
+			buildingId: 'admin',
+			floor: 2
+		});
+		expect(state.resolvePoi(marker.id)?.node).toEqual(data.graph.nodes[1]);
+		state.setHighlight('poi-a', 'start');
+		state.setHighlight(marker.id, 'goal');
+		expect(state.showRoute('a', state.resolvePoi(marker.id)!.node.id)).toEqual(['a', 'b']);
+		expect(state.highlights.goal).toBe(marker.id);
+	});
+
+	it('移行したPOIの消し忘れやマーカー同士のID重複を検出する', () => {
+		expect(() => createNavigationState({ ...data, markers: [{ ...marker, id: 'poi-b' }] })).toThrow(
+			'pois.tsから削除してください'
+		);
+		expect(() => createNavigationState({ ...data, markers: [marker, marker] })).toThrow(marker.id);
+		const state = createNavigationState({
+			...data,
+			pois: data.pois.filter(({ id }) => id !== 'poi-b'),
+			markers: [{ ...marker, id: 'poi-b' }]
+		});
+		expect(state.setHighlight('poi-b')).toBe(true);
+		expect(state.destinations.filter(({ id }) => id === 'poi-b')).toHaveLength(1);
+	});
+
+	it('経路ノードのないマーカーの選択を拒否して、現在の選択を維持する', () => {
+		const state = createNavigationState({
+			...data,
+			markers: [{ ...marker, nodeId: 'unknown-node' }]
+		});
+		state.setHighlight('poi-a');
+		expect(state.setHighlight(marker.id)).toBe(false);
+		expect(state.selectedPoi?.id).toBe('poi-a');
+	});
+
 	it('実データの出発地を2I-HRにし、選択や経路は初期化しない', () => {
 		const state = createNavigationState();
 		expect(state.highlights.start).toBe('poi_hr_2i');

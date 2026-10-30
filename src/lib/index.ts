@@ -1,4 +1,4 @@
-export type { Poi } from '../data/types';
+export type { Poi, MapMarker, Destination, DestinationLocation } from '../data/types';
 export type { BottomSheetSnap } from './components/BottomSheet.svelte';
 export { default as BottomSheet, BOTTOM_SHEET_PEEK_HEIGHT } from './components/BottomSheet.svelte';
 export type { ConnectedFloorLookup } from './map/connectedFloors';

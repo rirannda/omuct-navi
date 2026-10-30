@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Poi } from '#lib';
+	import type { Destination } from '#lib';
 
 	let {
 		results,
@@ -9,8 +9,8 @@
 		optionId,
 		maxHeight = '12.5rem'
 	}: {
-		results: Poi[];
-		onselect: (poi: Poi) => void;
+		results: Destination[];
+		onselect: (poi: Destination) => void;
 		activeIndex?: number;
 		listboxId: string;
 		optionId: (i: number) => string;
