@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!--
+    omuct-navi app icon (512)
+    Palette
+      Deep blue  #1D4ED8 : tile base, start marker, floor openings, shadows
+      Route blue #2563EB : route line, tile highlight
+      Amber      #FBBF24 : goal only
+      White      #FFFFFF : floor plates, background dots
+    Derived tints (white mixed with #1D4ED8)
+      6%  #F1F4FD : middle floor top    12% #E4EAFA : bottom floor top
+      30% #BBCAF3 : slab left side      45% #99AFED : slab right side
+    Geometry
+      Isometric 2:1, floor plate half-width 160 / half-height 80 / thickness 16
+      Floor centers x=256, y=152 / 248 / 344 (pitch 96 = 3 grid cells)
+      Route stroke 32, round caps and joins. Grid cell 32 (iso).
+  -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2563EB"/>
+      <stop offset="1" stop-color="#1D4ED8"/>
+    </linearGradient>
+    <!-- left / right slab faces in one path: hard stop at the center line -->
+    <linearGradient id="sideGrad" x1="96" y1="0" x2="416" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0.5" stop-color="#BBCAF3"/>
+      <stop offset="0.5" stop-color="#99AFED"/>
+    </linearGradient>
+    <!-- iso dot lattice aligned to the floor grid (nodes at s,t = ±16, ±48) -->
+    <pattern id="bgDots" width="32" height="32" patternUnits="userSpaceOnUse" patternTransform="matrix(1 0.5 -1 0.5 256 152)">
+      <circle cx="16" cy="16" r="3" fill="#FFFFFF" fill-opacity="0.1"/>
+    </pattern>
+    <pattern id="nodes" width="32" height="32" patternUnits="userSpaceOnUse" patternTransform="matrix(1 0.5 -1 0.5 256 152)">
+      <circle cx="16" cy="16" r="4.5" fill="#1D4ED8" fill-opacity="0.16"/>
+    </pattern>
+    <clipPath id="clipBottom"><path d="M256 264L416 344L256 424L96 344Z"/></clipPath>
+    <clipPath id="clipMid"><path d="M256 168L416 248L256 328L96 248Z"/></clipPath>
+  </defs>
+
+  <!-- bg: rounded tile, faint gradient + iso dot lattice -->
+  <g id="bg">
+    <rect width="512" height="512" rx="112" fill="url(#bgGrad)"/>
+    <rect width="512" height="512" rx="112" fill="url(#bgDots)"/>
+  </g>
+
+  <!-- floor-1: bottom plate (1F) -->
+  <g id="floor-1">
+    <path d="M96 344L256 424L416 344V360L256 440L96 360Z" fill="url(#sideGrad)"/>
+    <path d="M256 264L416 344L256 424L96 344Z" fill="#E4EAFA"/>
+    <path d="M256 264L416 344L256 424L96 344Z" fill="url(#nodes)"/>
+  </g>
+
+  <!-- route-1: start marker, 1F segment, riser that dives under 2F -->
+  <g id="route-1">
+    <path d="M160 344L256 392L320 360V272" fill="none" stroke="#2563EB" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="160" cy="344" r="24" fill="#1D4ED8"/>
+    <circle cx="160" cy="344" r="9" fill="#FFFFFF"/>
+  </g>
+
+  <!-- shadow cast by 2F onto 1F -->
+  <path id="shadow-2f" d="M256 182L416 262V278L256 358L96 278V262Z" fill="#1D4ED8" fill-opacity="0.18" clip-path="url(#clipBottom)"/>
+
+  <!-- floor-2: middle plate (2F) + opening where the route comes up -->
+  <g id="floor-2">
+    <path d="M96 248L256 328L416 248V264L256 344L96 264Z" fill="url(#sideGrad)"/>
+    <path d="M256 168L416 248L256 328L96 248Z" fill="#F1F4FD"/>
+    <path d="M256 168L416 248L256 328L96 248Z" fill="url(#nodes)"/>
+    <path d="M272 264L320 240L368 264L320 288Z" fill="#1D4ED8" fill-opacity="0.28"/>
+  </g>
+
+  <!-- route-2: 2F segment, riser that dives under 3F -->
+  <path id="route-2" d="M320 264L256 296V208" fill="none" stroke="#2563EB" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- shadow cast by 3F onto 2F -->
+  <path id="shadow-3f" d="M256 86L416 166V182L256 262L96 182V166Z" fill="#1D4ED8" fill-opacity="0.18" clip-path="url(#clipMid)"/>
+
+  <!-- floor-3: top plate (3F) + opening -->
+  <g id="floor-3">
+    <path d="M96 152L256 232L416 152V168L256 248L96 168Z" fill="url(#sideGrad)"/>
+    <path d="M256 72L416 152L256 232L96 152Z" fill="#FFFFFF"/>
+    <path d="M256 72L416 152L256 232L96 152Z" fill="url(#nodes)"/>
+    <path d="M208 200L256 176L304 200L256 224Z" fill="#1D4ED8" fill-opacity="0.28"/>
+  </g>
+
+  <!-- route-3: final 3F segment into the goal -->
+  <path id="route-3" d="M256 200L352 152" fill="none" stroke="#2563EB" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- goal: amber halo on the floor + amber disc -->
+  <g id="goal">
+    <ellipse cx="352" cy="152" rx="46" ry="23" fill="#FBBF24" fill-opacity="0.35"/>
+    <circle cx="352" cy="152" r="33" fill="#FBBF24"/>
+    <circle cx="352" cy="152" r="12" fill="#FFFFFF"/>
+  </g>
+</svg>
