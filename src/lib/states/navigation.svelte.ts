@@ -4,7 +4,16 @@ import { nodes } from '../../data/nodes';
 import { edges } from '../../data/edges';
 import { edgeStairs } from '../../data/edge_stair';
 import { pois } from '../../data/pois';
-import type { Node, Poi, EnhancedEdge } from '../../data/types';
+import { markers } from '../../data/markers';
+import type {
+	Node,
+	Poi,
+	MapMarker,
+	Destination,
+	DestinationLocation,
+	EnhancedEdge
+} from '../../data/types';
+import { getNodeBuildingId } from '../map/nodeBuilding';
 import type { HighlightColor } from '../map/highlightColors';
 import { highlightRoles } from '../map/highlightColors';
 import { SvelteMap } from 'svelte/reactivity';
@@ -14,13 +23,24 @@ export type PoiHighlights = Readonly<Partial<Record<HighlightColor, string>>>;
 export type NavigationData = {
 	graph: { nodes: Node[]; edges: EnhancedEdge[] };
 	pois: readonly Poi[];
+	markers?: readonly MapMarker[];
 };
 
 /** ページごとに生成する共有状態。描画先やカメラ位置には依存しません。 */
 export function createNavigationState(data?: NavigationData) {
 	const graph = data?.graph ?? buildGraph(nodes, edges, edgeStairs);
 	const poiData = data?.pois ?? pois;
-	const poiById = new SvelteMap(poiData.map((poi) => [poi.id, poi]));
+	const markerData = data ? (data.markers ?? []) : markers;
+	const destinations: readonly Destination[] = [...poiData, ...markerData];
+	const poiById = new SvelteMap<string, Destination>();
+	for (const destination of destinations) {
+		if (poiById.has(destination.id)) {
+			throw new Error(
+				`目的地IDが重複しています: ${destination.id}。マーカーへ移行した施設はpois.tsから削除してください。`
+			);
+		}
+		poiById.set(destination.id, destination);
+	}
 	const nodeById = new SvelteMap(graph.nodes.map((node) => [node.id, node]));
 	const defaultStart = poiById.get('poi_hr_2i');
 	let highlights = $state.raw<PoiHighlights>(
@@ -33,10 +53,18 @@ export function createNavigationState(data?: NavigationData) {
 	let routeErrorVersion = $state(0);
 	let routeRequest: { startId: string; goalId: string } | null = null;
 
-	function resolvePoi(poiId: string): { poi: Poi; node: Node } | undefined {
+	/** 既存のAPI名を維持し、部屋のPOIとマーカーを共通の選択対象として解決します。 */
+	function resolvePoi(
+		poiId: string
+	): { poi: Destination; node: Node; location: DestinationLocation } | undefined {
 		const poi = poiById.get(poiId);
 		const node = poi ? nodeById.get(poi.nodeId) : undefined;
-		return poi && node ? { poi, node } : undefined;
+		if (!poi || !node) return;
+		const location =
+			'svgId' in poi
+				? { x: node.x, y: node.y, floor: node.floor, buildingId: getNodeBuildingId(node) }
+				: { x: poi.x, y: poi.y, floor: poi.floor, buildingId: poi.buildingId };
+		return { poi, node, location };
 	}
 
 	function setHighlight(poiId: string, role: HighlightColor = 'selected'): boolean {
@@ -75,6 +103,8 @@ export function createNavigationState(data?: NavigationData) {
 	return {
 		graph,
 		pois: poiData,
+		markers: markerData,
+		destinations,
 		resolvePoi,
 		setHighlight,
 		clearHighlight,

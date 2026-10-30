@@ -350,6 +350,37 @@ describe('Map floor maps', () => {
 		expect(container.querySelector('.route-endpoint-start')).not.toBeNull();
 	});
 
+	it.each([
+		{ width: 390, fontSize: 16 },
+		{ width: 390, fontSize: 24 },
+		{ width: 1280, fontSize: 16 },
+		{ width: 1280, fontSize: 24 }
+	])(
+		'middleでルート検索ボタンまでスクロールせず表示する ($width px / $fontSize px)',
+		async ({ width, fontSize }) => {
+			await page.viewport(width, 844);
+			const root = document.documentElement;
+			const originalFontSize = root.style.fontSize;
+			try {
+				root.style.fontSize = `${fontSize}px`;
+				mockMaps();
+				const { container, getByRole } = await renderFloorMap();
+				await getByRole('button', { name: 'ボトムシートの高さを変更' }).click();
+				const sheet = container.querySelector<HTMLElement>('.bottom-sheet')!;
+				const content = container.querySelector<HTMLElement>('.sheet-content')!;
+				const submit = container.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+				await expect.poll(() => content.scrollHeight - content.clientHeight).toBeLessThanOrEqual(1);
+				expect(sheet.dataset.snap).toBe('middle');
+				expect(content.scrollTop).toBe(0);
+				expect(submit.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+					content.getBoundingClientRect().bottom
+				);
+			} finally {
+				root.style.fontSize = originalFontSize;
+			}
+		}
+	);
+
 	it('シートに帰属表示を追従させ、上段では階層UIを隠し、戻すと選択階を復元する', async () => {
 		mockMaps();
 		const { container, getByRole } = await renderFloorMap();

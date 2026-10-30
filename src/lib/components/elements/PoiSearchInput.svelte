@@ -1,9 +1,12 @@
 <script lang="ts">
 	import type { HTMLInputAttributes } from 'svelte/elements';
-	import type { Poi } from '#lib';
+	import type { Destination } from '#lib';
 	import PoiSearchList from '#lib/components/elements/PoiSearchList.svelte';
 	import Fuse from 'fuse.js';
 	import { pois } from '../../../data/pois';
+	import { markers } from '../../../data/markers';
+
+	const defaultDestinations: readonly Destination[] = [...pois, ...markers];
 
 	let {
 		onselect,
@@ -14,6 +17,7 @@
 		query = $bindable(''),
 		inlineResults = false,
 		resultsMaxHeight = '12.5rem',
+		destinations = defaultDestinations,
 		...rest
 	}: {
 		onselect: (poiId: string) => void;
@@ -24,6 +28,7 @@
 		query?: string;
 		inlineResults?: boolean;
 		resultsMaxHeight?: string;
+		destinations?: readonly Destination[];
 	} & Omit<
 		HTMLInputAttributes,
 		'value' | 'onselect' | 'placeholder' | 'oninput' | 'onkeydown' | 'onfocus' | 'onblur'
@@ -35,12 +40,14 @@
 	const optionId = (i: number) => `${uid}-option-${i}`;
 
 	const MAX_RESULTS = 20;
-	const fuse = new Fuse(pois, {
-		keys: ['name', 'keys'],
-		useTokenSearch: true,
-		threshold: 0.3,
-		ignoreLocation: true
-	});
+	const fuse = $derived(
+		new Fuse(destinations, {
+			keys: ['name', 'keys'],
+			useTokenSearch: true,
+			threshold: 0.3,
+			ignoreLocation: true
+		})
+	);
 
 	let open = $state(false);
 	let activeIndex = $state(-1);
@@ -61,7 +68,7 @@
 		onsearch?.(query);
 	}
 
-	function select(poi: Poi) {
+	function select(poi: Destination) {
 		query = poi.name;
 		close();
 		onselect(poi.id);

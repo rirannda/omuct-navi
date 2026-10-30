@@ -73,6 +73,53 @@
 	border-top-color: var(--poi-highlight-stroke, #b45309);
 }
 
+.facility-marker {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	cursor: pointer;
+}
+
+.facility-marker:focus-visible {
+	outline: 3px solid #2563eb;
+	outline-offset: 2px;
+}
+
+.facility-marker-symbol {
+	display: flex;
+	width: 32px;
+	height: 32px;
+	align-items: center;
+	justify-content: center;
+	border: 2px solid #2563eb;
+	border-radius: 50%;
+	background: white;
+	color: #1e40af;
+	box-shadow: 0 2px 6px rgb(0 0 0 / 20%);
+}
+
+.facility-marker-symbol img {
+	width: 24px;
+	height: 24px;
+	object-fit: contain;
+}
+
+.facility-marker-highlight .facility-marker-symbol {
+	border-color: var(--poi-highlight-stroke);
+	background: var(--poi-highlight-fill);
+	color: var(--poi-highlight-text);
+}
+
+.facility-marker-tooltip {
+	border-color: var(--poi-highlight-stroke, #2563eb);
+	color: var(--poi-highlight-text, #1e40af);
+}
+
+.facility-marker-tooltip.leaflet-tooltip-top::before {
+	border-top-color: var(--poi-highlight-stroke, #2563eb);
+}
+
 .route-endpoint-symbol {
 	display: flex;
 	width: 100%;

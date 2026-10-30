@@ -21,6 +21,8 @@
 	} = $props();
 
 	const snaps: readonly BottomSheetSnap[] = ['bottom', 'middle', 'top'];
+	const MIDDLE_HEIGHT_RATIO = 0.3;
+	const MIDDLE_MIN_HEIGHT = 320;
 	const id = $props.id();
 	const contentId = `${id}-content`;
 	let availableHeight = $state(0);
@@ -40,7 +42,7 @@
 		const maximum = availableHeight || BOTTOM_SHEET_PEEK_HEIGHT;
 		if (position === 'top') return maximum;
 		if (position === 'middle')
-			return Math.max(Math.min(BOTTOM_SHEET_PEEK_HEIGHT, maximum), maximum / 3);
+			return Math.min(maximum, Math.max(MIDDLE_MIN_HEIGHT, maximum * MIDDLE_HEIGHT_RATIO));
 		return Math.min(BOTTOM_SHEET_PEEK_HEIGHT, maximum);
 	}
 

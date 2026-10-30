@@ -4,7 +4,7 @@
 	import { requireNavigation } from '../../states/navigation.svelte';
 	import type { NavigationState } from '../../states/navigation.svelte';
 	import { buildingMaps } from '../../../data/maps';
-	import { getNodeBuildingId } from '../../map/nodeBuilding';
+	import { buildingNames } from '../../../data/buildings';
 	import { formatFloorLabel } from '../../map/floorDisplay';
 
 	let {
@@ -24,13 +24,13 @@
 	const poi = $derived(navigation.selectedPoi);
 	const location = $derived(poi ? navigation.resolvePoi(poi.id) : undefined);
 	const building = $derived(
-		location ? buildingMaps.find(({ id }) => id === getNodeBuildingId(location.node)) : undefined
+		location ? buildingMaps.find(({ id }) => id === location.location.buildingId) : undefined
 	);
 	const floorName = $derived(
 		location
-			? getNodeBuildingId(location.node) === 'outdoor'
+			? location.location.buildingId === 'outdoor'
 				? '屋外'
-				: formatFloorLabel(getNodeBuildingId(location.node), location.node.floor, false)
+				: formatFloorLabel(location.location.buildingId, location.location.floor, false)
 			: ''
 	);
 	const start = $derived(
@@ -109,7 +109,13 @@
 							? 'mt-1 text-sm text-slate-500'
 							: 'truncate text-xs leading-3 text-slate-500'}
 					>
-						{[building?.name, floorName].filter(Boolean).join(' · ')}
+						{[
+							building?.name ??
+								(location ? buildingNames[location.location.buildingId] : undefined),
+							floorName
+						]
+							.filter(Boolean)
+							.join(' · ')}
 					</p>
 				</div>
 				<button
@@ -164,6 +170,7 @@
 					bind:query={startQuery}
 					inlineResults
 					{resultsMaxHeight}
+					destinations={navigation.destinations}
 					onsearch={(query) => search('start', query)}
 					onselect={(poiId) => select('start', poiId)}
 				/>
@@ -182,6 +189,7 @@
 							bind:query={goalQuery}
 							inlineResults
 							{resultsMaxHeight}
+							destinations={navigation.destinations}
 							onsearch={(query) => search('goal', query)}
 							onselect={(poiId) => select('goal', poiId)}
 						/>
