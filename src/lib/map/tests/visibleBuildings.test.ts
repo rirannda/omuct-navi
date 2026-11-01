@@ -20,12 +20,10 @@ describe('getVisibleBuildings', () => {
 	});
 
 	it('レイヤーがない建物は対象にせず、1階以外だけ公開されている建物も対象にする', () => {
-		const buildings = buildingMaps.slice(0, 2).map(
-			(building, index): BuildingMap => ({
-				...building,
-				floors: index === 0 ? {} : { 2: 'only_F2.svg' }
-			})
-		);
+		const buildings = buildingMaps.slice(0, 2).map((building, index): BuildingMap => ({
+			...building,
+			floors: index === 0 ? {} : { 2: 'only_F2.svg' }
+		}));
 		expect(getVisibleBuildings(buildings, [0, 0, 1400, 1700]).map(({ id }) => id)).toEqual(['ss1']);
 	});
 });

@@ -148,7 +148,7 @@
 	>
 		<button
 			class={[
-				'drag-handle flex w-full flex-[0_0_48px] touch-none items-center justify-center rounded-t-3xl border-0 bg-transparent p-0 select-none focus-visible:outline-2 focus-visible:outline-solid focus-visible:outline-[#2563eb] focus-visible:-outline-offset-4',
+				'drag-handle flex w-full flex-[0_0_48px] touch-none items-center justify-center rounded-t-3xl border-0 bg-transparent p-0 select-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-[#2563eb] focus-visible:outline-solid',
 				dragging ? 'cursor-grabbing' : 'cursor-grab'
 			]}
 			type="button"
