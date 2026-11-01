@@ -1,46 +1,23 @@
-# sv
+# OMUCT Navi
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+OMUCT Naviは、校内の教室や施設を探し、目的地までの経路を地図で確認できるナビゲーションアプリです。
 
-## Creating a project
+## 主な機能
 
-If you're seeing this, you've probably already done this step. Congrats!
+- 校内マップ：建物を選択し、階ごとのフロアマップを確認できます。
+- 施設検索：教室や施設を名前・キーワードから検索できます。
+- 経路案内：出発地と目的地を選ぶと、経路や建物・階の移動箇所を地図上に表示します。
+- バリアフリー検索：階段を使わない経路を検索できます。
+- 施設情報：地図上の施設を選択して所在地や登録された説明を確認し、出発地・目的地に設定できます。
 
-```sh
-# create a new project
-npx sv create my-app
-```
+## 使い方
 
-To recreate this project with the same configuration:
+1. 画面下部の検索欄を開き、出発地と行き先を検索します。
+2. それぞれ検索候補から場所を選び、「ルート検索」を押します。
+3. 地図上の経路を確認します。必要に応じて建物や階を切り替えられます。
 
-```sh
-# recreate this project
-bun x sv@0.16.1 create --template minimal --types ts --add prettier eslint vitest="usages:unit,component" tailwindcss="plugins:none" sveltekit-adapter="adapter:cloudflare+cfTarget:pages" --install bun omuct-navi
-```
+バリアフリー設定では、登録された経路情報から階段を除いて検索します。現地の段差や通行状況がすべて反映されているとは限らないため、実際の状況もご確認ください。
 
-## Developing
+## NixOS
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```sh
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```sh
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
-
-## Nixos
-
-if you use nixos to develop, type `steam-run` befor `bun dev`.
+NixOSで開発を行なう場合は `steam-run` を `bun dev` の前に入力してください。
