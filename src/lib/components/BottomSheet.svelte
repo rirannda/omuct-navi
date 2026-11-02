@@ -1,6 +1,6 @@
 <script module lang="ts">
 	export type BottomSheetSnap = 'bottom' | 'middle' | 'top';
-	export const BOTTOM_SHEET_PEEK_HEIGHT = 144;
+	export const BOTTOM_SHEET_PEEK_HEIGHT = 120;
 </script>
 
 <script lang="ts">
@@ -9,11 +9,17 @@
 
 	let {
 		snap = $bindable<BottomSheetSnap>('bottom'),
+		peekHeight = BOTTOM_SHEET_PEEK_HEIGHT,
+		middleMinHeight = 320,
 		onheightchange,
 		onsettle,
 		children
 	}: {
 		snap?: BottomSheetSnap;
+		/** 下段の操作欄を収める高さ。表示領域の高さで上限を設けます。 */
+		peekHeight?: number;
+		/** 中段の操作欄を収める最低高。表示領域の高さで上限を設けます。 */
+		middleMinHeight?: number;
 		/** アニメーション・ドラッグ中も、画面を覆っている高さを通知します。 */
 		onheightchange?: (height: number) => void;
 		onsettle?: (snap: BottomSheetSnap, height: number) => void;
@@ -22,11 +28,10 @@
 
 	const snaps: readonly BottomSheetSnap[] = ['bottom', 'middle', 'top'];
 	const MIDDLE_HEIGHT_RATIO = 0.3;
-	const MIDDLE_MIN_HEIGHT = 320;
 	const id = $props.id();
 	const contentId = `${id}-content`;
 	let availableHeight = $state(0);
-	let height = $state(BOTTOM_SHEET_PEEK_HEIGHT);
+	let height = $state(untrack(() => peekHeight));
 	let dragging = $state(false);
 	let animationFrame: number | undefined;
 	let pointerId: number | undefined;
@@ -39,11 +44,11 @@
 	let suppressClick = false;
 
 	function snapHeight(position: BottomSheetSnap): number {
-		const maximum = availableHeight || BOTTOM_SHEET_PEEK_HEIGHT;
+		const maximum = availableHeight || peekHeight;
 		if (position === 'top') return maximum;
 		if (position === 'middle')
-			return Math.min(maximum, Math.max(MIDDLE_MIN_HEIGHT, maximum * MIDDLE_HEIGHT_RATIO));
-		return Math.min(BOTTOM_SHEET_PEEK_HEIGHT, maximum);
+			return Math.min(maximum, Math.max(middleMinHeight, maximum * MIDDLE_HEIGHT_RATIO));
+		return Math.min(peekHeight, maximum);
 	}
 
 	function cancelAnimation() {
@@ -73,8 +78,8 @@
 	$effect(() => {
 		// 親領域のリサイズ時も、現在のスナップ位置に合わせ直します。
 		const position = snap;
-		const maximum = availableHeight;
-		if (maximum && !dragging) untrack(() => animateTo(snapHeight(position)));
+		const target = snapHeight(position);
+		if (availableHeight && !dragging) untrack(() => animateTo(target));
 	});
 	$effect(() => {
 		const currentHeight = height;

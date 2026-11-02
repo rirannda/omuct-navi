@@ -1,5 +1,8 @@
 <script lang="ts">
 	import PoiSearchInput from '#lib/components/elements/PoiSearchInput.svelte';
+	import { singleLineDestinationName } from '../../destinationName';
+	import NearbyFacilitySearch from './NearbyFacilitySearch.svelte';
+	import LocationConsent from '../LocationConsent.svelte';
 	import type { BottomSheetSnap } from '../BottomSheet.svelte';
 	import { requireNavigation } from '../../states/navigation.svelte';
 	import type { NavigationState } from '../../states/navigation.svelte';
@@ -40,15 +43,18 @@
 		navigation.highlights.goal ? navigation.resolvePoi(navigation.highlights.goal) : undefined
 	);
 	const canNavigate = $derived(
-		start && goal && startQuery === start.poi.name && goalQuery === goal.poi.name
+		start &&
+			goal &&
+			startQuery === singleLineDestinationName(start.poi.name) &&
+			goalQuery === singleLineDestinationName(goal.poi.name)
 	);
 	const resultsMaxHeight = $derived(snap === 'top' ? 'max(8rem, calc(100dvh - 20rem))' : '10rem');
 
 	$effect(() => {
-		if (start) startQuery = start.poi.name;
+		if (start) startQuery = singleLineDestinationName(start.poi.name);
 	});
 	$effect(() => {
-		if (goal) goalQuery = goal.poi.name;
+		if (goal) goalQuery = singleLineDestinationName(goal.poi.name);
 	});
 
 	$effect(() => {
@@ -58,7 +64,7 @@
 
 	function search(role: Role, query: string) {
 		const selected = role === 'start' ? start : goal;
-		if (selected && selected.poi.name !== query) {
+		if (selected && singleLineDestinationName(selected.poi.name) !== query) {
 			navigation.clearHighlight(role);
 			navigation.clearRoute();
 		}
@@ -66,6 +72,7 @@
 	}
 
 	function select(role: Role, poiId: string) {
+		navigation.clearFacilitySearch();
 		navigation.clearRoute();
 		navigation.setHighlight(poiId, role);
 		if (snap !== 'middle') snap = 'middle';
@@ -78,6 +85,13 @@
 		navigation.clearHighlight('selected');
 	}
 
+	function selectFacility(id: string) {
+		navigation.clearFacilitySearch();
+		navigation.setHighlight(id);
+		if (snap !== 'middle') snap = 'middle';
+		navigation.requestFocus(id, { showFloor: true });
+	}
+
 	function navigate(event: SubmitEvent) {
 		event.preventDefault();
 		if (!canNavigate || !start || !goal) return;
@@ -85,6 +99,7 @@
 			return;
 		}
 		if (snap === 'top') snap = 'middle';
+		navigation.requestGpsForRoute();
 		navigation.requestFocus(start.poi.id);
 	}
 </script>
@@ -95,13 +110,15 @@
 			<div class="flex items-start justify-between gap-3">
 				<div class="min-w-0">
 					{#if expanded}
-						<h2 class="text-xl leading-7 font-semibold break-words">{poi.name}</h2>
+						<h2 class="text-xl leading-7 font-semibold break-words whitespace-pre-line">
+							{poi.name}
+						</h2>
 					{:else}
 						<button
 							type="button"
 							class="block w-full truncate text-left text-base leading-5 font-semibold"
-							aria-label={`${poi.name}の詳細を表示`}
-							onclick={() => (snap = 'middle')}>{poi.name}</button
+							aria-label={`${singleLineDestinationName(poi.name)}の詳細を表示`}
+							onclick={() => (snap = 'middle')}>{singleLineDestinationName(poi.name)}</button
 						>
 					{/if}
 					<p
@@ -194,36 +211,53 @@
 							onselect={(poiId) => select('goal', poiId)}
 						/>
 					</div>
-					<button
-						type="button"
-						role="switch"
-						aria-label="バリアフリー"
-						aria-checked={navigation.barrierFree}
-						aria-describedby={`${id}-barrier-free-hint`}
-						class="flex min-h-13 shrink-0 flex-col items-center justify-center gap-1 rounded-lg px-1 text-xs font-medium text-slate-600 focus-visible:outline-2 focus-visible:outline-blue-600"
-						onclick={() => navigation.setBarrierFree(!navigation.barrierFree)}
-					>
-						<span>バリアフリー</span>
-						<span
-							aria-hidden="true"
-							class={[
-								'flex h-6 w-11 items-center rounded-full p-0.5 transition-colors',
-								navigation.barrierFree ? 'bg-blue-600' : 'bg-slate-300'
-							]}
-						>
-							<span
-								class={[
-									'size-5 rounded-full bg-white shadow-sm transition-transform',
-									navigation.barrierFree && 'translate-x-5'
-								]}
-							></span>
-						</span>
-					</button>
-					<span id={`${id}-barrier-free-hint`} class="sr-only"
-						>階段を使わない経路を検索します。</span
-					>
 				</div>
 			</div>
+			{#if snap === 'middle' || (navigation.isFestival && (snap === 'bottom' || navigation.facilitySearch))}
+				<div class="flex flex-wrap items-center gap-2" aria-label="検索オプション">
+					{#if snap === 'middle'}
+						<button
+							type="button"
+							role="switch"
+							aria-label="バリアフリー"
+							aria-checked={navigation.barrierFree}
+							aria-describedby={`${id}-barrier-free-hint`}
+							class="flex min-h-13 w-24 shrink-0 flex-col items-center justify-center gap-1 rounded-lg px-1 text-xs font-medium text-slate-600 focus-visible:outline-2 focus-visible:outline-blue-600"
+							onclick={() => navigation.setBarrierFree(!navigation.barrierFree)}
+						>
+							<span>バリアフリー</span>
+							<span
+								aria-hidden="true"
+								class={[
+									'flex h-6 w-11 items-center rounded-full p-0.5 transition-colors',
+									navigation.barrierFree ? 'bg-blue-600' : 'bg-slate-300'
+								]}
+							>
+								<span
+									class={[
+										'size-5 rounded-full bg-white shadow-sm transition-transform',
+										navigation.barrierFree && 'translate-x-5'
+									]}
+								></span>
+							</span>
+						</button>
+						<span id={`${id}-barrier-free-hint`} class="sr-only"
+							>階段を使わない経路を検索します。</span
+						>
+					{/if}
+					{#if navigation.isFestival}
+						<NearbyFacilitySearch
+							{navigation}
+							showButtons={snap !== 'top'}
+							showSearch={expanded}
+							onsearch={() => {
+								if (snap === 'bottom') snap = 'middle';
+							}}
+							onselect={selectFacility}
+						/>
+					{/if}
+				</div>
+			{/if}
 			{#if expanded}
 				<div class="flex flex-wrap gap-2 pt-1">
 					<button
@@ -251,4 +285,31 @@
 			{navigation.routeError}
 		</p>
 	{/if}
+	{#if navigation.gps.error}
+		<p role="alert" class="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+			{navigation.gps.error}
+		</p>
+	{/if}
+	{#if snap === 'top'}
+		<div
+			class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-3 text-sm"
+		>
+			<a
+				href="/privacy"
+				target="_blank"
+				rel="noopener"
+				class="min-h-11 py-2 text-blue-700 underline underline-offset-4"
+				>位置情報の取り扱い（別タブ）</a
+			>
+			{#if navigation.gpsLocation.enabled}
+				<button
+					type="button"
+					class="min-h-11 rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100"
+					onclick={() => navigation.gps.stop()}>位置情報の利用を停止</button
+				>
+			{/if}
+		</div>
+	{/if}
 </div>
+
+<LocationConsent {navigation} />

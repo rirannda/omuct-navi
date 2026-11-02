@@ -173,7 +173,7 @@ export function createRouteLayer(
 		}
 	}
 
-	function fitCurrentFloorRoute(floor: number) {
+	function fitCurrentFloorRoute(floor: number, animate = true) {
 		if (!map || !leaflet) return;
 
 		const points = routePointsByFloor[floor];
@@ -181,7 +181,8 @@ export function createRouteLayer(
 
 		map.fitBounds(leaflet.latLngBounds(points), {
 			padding: [56, 64],
-			maxZoom: 2
+			maxZoom: 2,
+			animate
 		});
 	}
 

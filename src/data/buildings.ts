@@ -15,3 +15,8 @@ export const buildingNames: Record<string, string> = {
 	staircase: '中央階段',
 	outdoor: '屋外'
 };
+
+/** 詳細図がなく、データ上の階番号だけでは実際の所在階を判断できない建物。 */
+export const buildingFloorLabels: Readonly<Record<string, Readonly<Record<number, string>>>> = {
+	admin: { 0: '階不明' }
+};

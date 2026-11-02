@@ -1,9 +1,13 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { userEvent } from 'vitest/browser';
 import type { MapMarker } from '../../../data/types';
 import Map from '../Map.svelte';
 import { createNavigationState } from '../../states/navigation.svelte';
+import { LOCATION_CONSENT_KEY } from '../../states/geolocation.svelte';
+
+beforeEach(() => localStorage.setItem(LOCATION_CONSENT_KEY, 'declined'));
+afterEach(() => localStorage.removeItem(LOCATION_CONSENT_KEY));
 
 const { markerData } = vi.hoisted(() => ({
 	markerData: [
@@ -17,6 +21,7 @@ const { markerData } = vi.hoisted(() => ({
 			icon: '',
 			buildingId: 'outdoor',
 			floor: 0,
+			visibility: 'always',
 			x: 700,
 			y: 800
 		},
@@ -29,6 +34,20 @@ const { markerData } = vi.hoisted(() => ({
 			icon: '',
 			buildingId: 'admin',
 			floor: 2,
+			visibility: 'always',
+			x: 500,
+			y: 800
+		},
+		{
+			id: 'marker-floor',
+			name: '教養棟2階のトイレ',
+			categoryId: 'toilet',
+			nodeId: 'node_outdoor_f0_main-gate',
+			description: '',
+			icon: '',
+			buildingId: 'la',
+			floor: 2,
+			visibility: 'floor',
 			x: 500,
 			y: 800
 		}
@@ -38,6 +57,7 @@ const { markerData } = vi.hoisted(() => ({
 vi.mock('../../../data/markers', async () => {
 	markerData[0].icon = (await import('../../assets/markers/trash.svg')).default;
 	markerData[1].icon = (await import('../../assets/markers/toilet-accessible.svg')).default;
+	markerData[2].icon = (await import('../../assets/markers/toilet-men.svg')).default;
 	return { markers: markerData };
 });
 
@@ -55,6 +75,17 @@ async function setup() {
 }
 
 describe('Map marker integration', () => {
+	it('階限定は検索で所属階を開くと表示し、全体図に戻すと再び隠す', async () => {
+		const { container, navigation } = await setup();
+		const floorMarker = () => container.querySelector('[data-marker-id="marker-floor"]');
+		expect(floorMarker()).toBeNull();
+		navigation.requestFocus('marker-floor', { showFloor: true });
+		await expect.poll(floorMarker).not.toBeNull();
+		container.querySelector<HTMLElement>('.leaflet-container')!.click();
+		await expect.poll(floorMarker).toBeNull();
+		expect(container.querySelector('[data-marker-id="marker-admin"]')).not.toBeNull();
+	});
+
 	it('markers.tsを読み込み、SVGのない地点をタッチして詳細と目的地を設定する', async () => {
 		const { container, getByRole, navigation } = await setup();
 		expect(container.querySelectorAll('.facility-marker')).toHaveLength(2);

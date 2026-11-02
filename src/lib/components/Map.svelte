@@ -14,6 +14,10 @@
 	import { createRouteLayer } from '../map/routeLayer';
 	import { createPoiLayer } from '../map/poiLayer';
 	import { createMarkerLayer } from '../map/markerLayer';
+	import { createLocationLayer } from '../map/locationLayer';
+	import { isPositionOnRoute } from '../map/routePosition';
+	import type { MapPosition } from '../map/geolocationProjection';
+	import { getRouteDisplay } from '../route/routeDisplay';
 	import { getNodeBuildingId } from '../map/nodeBuilding';
 	import { getRouteEntryFloors } from '../route/routeFloors';
 	import { layoutFloorControls } from '../map/floorControlLayout';
@@ -33,10 +37,22 @@
 	const view = createMapViewState(buildingMaps, getConnectedFloor);
 	let mapContainer: HTMLDivElement;
 	let map: L.Map | undefined;
+	let mapZoom = $state<number | null>(null);
 	let svgLayers: ReturnType<typeof createSvgLayers> | undefined;
 	let routeLayer: ReturnType<typeof createRouteLayer> | undefined;
 	let poiLayer: ReturnType<typeof createPoiLayer> | undefined;
 	let markerLayer: ReturnType<typeof createMarkerLayer> | undefined;
+	let locationLayer: ReturnType<typeof createLocationLayer> | undefined;
+	let followArmed = $state(false);
+	let pendingLocationFocus = false;
+	let pendingRouteFocus = false;
+	let appliedCurrentLocationRequest = 0;
+	const routeSegments = $derived(
+		navigation.routePath
+			? getRouteDisplay([...navigation.routePath], navigation.graph.nodes, navigation.graph.edges)
+					.segments
+			: []
+	);
 	let svgLayersReady = $state(false);
 	let disposed = false;
 	let buildingControlsContainer = $state<HTMLDivElement>();
@@ -46,7 +62,13 @@
 	let bottomSheetSnap = $state<BottomSheetSnap>('bottom');
 	let settledSheetSnap = $state<BottomSheetSnap>('bottom');
 	let appliedFocusRequest: NavigationState['focusRequest'] = null;
+	let appliedFacilitySearch: NavigationState['facilitySearch'] = null;
 	let bottomSheetHeight = $state(BOTTOM_SHEET_PEEK_HEIGHT);
+	let rootFontSize = $state(16);
+	const middleMinHeight = $derived(20 * rootFontSize + 56);
+	const peekHeight = $derived(
+		navigation.isFestival ? 8.5 * rootFontSize + 56 : BOTTOM_SHEET_PEEK_HEIGHT
+	);
 	let previousSheetSnap: BottomSheetSnap = 'bottom';
 	let previousSheetHeight = BOTTOM_SHEET_PEEK_HEIGHT;
 	let sheetMapOffset = BOTTOM_SHEET_PEEK_HEIGHT / 2;
@@ -60,6 +82,7 @@
 	);
 	let routeBuildings: BuildingMap[] = [];
 	let renderedRoute: readonly string[] | null | undefined;
+	let interactedRoute: NavigationState['routePath'] | undefined;
 	let renderedHighlights: PoiHighlights = {};
 
 	$effect(() => {
@@ -76,9 +99,12 @@
 	$effect(() => {
 		const path = navigation.routePath;
 		const highlights = navigation.highlights;
+		const markerIds = navigation.facilitySearch
+			? navigation.facilityResults.map(({ id }) => id)
+			: null;
 		const ready = svgLayersReady;
 		untrack(() => {
-			if (ready) renderNavigation(path, highlights);
+			if (ready) renderNavigation(path, highlights, markerIds);
 		});
 	});
 	$effect(() => {
@@ -95,7 +121,11 @@
 			sheetMapOffset = offset;
 			adjustingSheet = true;
 			try {
-				if (movement) map!.panBy([0, movement], { animate: false });
+				if (movement) {
+					// 地図の境界で復帰アニメーションとシートの移動が競合しないようにします。
+					const center = map!.project(map!.getCenter()).add([0, movement]);
+					map!.setView(map!.unproject(center), map!.getZoom(), { animate: false });
+				}
 				updateDisplays();
 			} finally {
 				adjustingSheet = false;
@@ -109,6 +139,8 @@
 			untrack(() => {
 				if (request === appliedFocusRequest) return;
 				appliedFocusRequest = request;
+				const gps = navigation.gpsLocation;
+				if (navigation.routePath && (gps.enabled || navigation.gps.requesting)) return;
 				focusOnPoiId(request.poiId);
 				if (request.showFloor && !navigation.routePath) {
 					const target = navigation.resolvePoi(request.poiId);
@@ -125,12 +157,89 @@
 		}
 	});
 
-	function renderNavigation(path = navigation.routePath, highlights = navigation.highlights) {
+	$effect(() => {
+		const request = navigation.facilitySearch;
+		const results = navigation.facilityResults;
+		const ready = svgLayersReady;
+		const settled = bottomSheetSnap === settledSheetSnap;
+		const height = bottomSheetHeight;
+		untrack(() => {
+			if (!request) {
+				appliedFacilitySearch = null;
+				return;
+			}
+			if (!ready || !settled || !results.length || request === appliedFacilitySearch) return;
+			if (map!.getSize().y - height < 100) return;
+			appliedFacilitySearch = request;
+			const first = results[0];
+			switchFloor(first.buildingId, first.floor);
+			if (
+				!navigation.routePath &&
+				buildingMaps.find(({ id }) => id === first.buildingId)?.floors[first.floor]
+			)
+				selectBuilding(first.buildingId);
+			const points: L.LatLngTuple[] = results.map(({ x, y }) => [y, x]);
+			const gps = navigation.gpsLocation;
+			if (gps.enabled && gps.position) points.push([gps.position.y, gps.position.x]);
+			map!.fitBounds(points, {
+				paddingTopLeft: [24, 24],
+				paddingBottomRight: [24, height + 24],
+				maxZoom: 2,
+				animate: false
+			});
+		});
+	});
+
+	$effect(() => {
+		const gps = navigation.gpsLocation;
+		const request = navigation.currentLocationRequest;
+		const segments = routeSegments;
+		const floors = { ...view.activeFloors };
+		const ready = svgLayersReady;
+		const canCenter =
+			bottomSheetSnap !== 'top' && bottomSheetSnap === settledSheetSnap && mapZoom !== null;
+		const height = bottomSheetHeight;
+		const follow = followArmed;
+		untrack(() => {
+			if (!ready) return;
+			if (request !== appliedCurrentLocationRequest) {
+				appliedCurrentLocationRequest = request;
+				followArmed = true;
+				pendingLocationFocus = true;
+			}
+			const position = gps.enabled ? gps.position : null;
+			locationLayer?.update(position);
+			if (!gps.enabled) pendingLocationFocus = false;
+			if (!position || !canCenter) return;
+			if (pendingLocationFocus) {
+				pendingLocationFocus = false;
+				pendingRouteFocus = false;
+				centerOnCurrentPosition(position, height, 2);
+			} else if (
+				follow &&
+				isPositionOnRoute(position, segments, floors, navigation.gps.routeTolerance)
+			) {
+				// 全体表示の縮尺ではmaxBoundsが中央移動を制限するため、追従開始時に拡大します。
+				centerOnCurrentPosition(position, height, pendingRouteFocus ? 2 : map!.getZoom());
+				pendingRouteFocus = false;
+			}
+		});
+	});
+
+	function renderNavigation(
+		path = navigation.routePath,
+		highlights = navigation.highlights,
+		markerIds: readonly string[] | null = navigation.facilitySearch
+			? navigation.facilityResults.map(({ id }) => id)
+			: null
+	) {
 		if (!svgLayersReady || disposed) return;
 		const routeChanged = path !== renderedRoute;
 		let routeStart: Node | undefined;
 		if (routeChanged) {
 			renderedRoute = path;
+			followArmed = !!path && path !== interactedRoute;
+			pendingRouteFocus = !!path;
 			controlBuildingId = path ? undefined : selectedBuildingId;
 			const entryFloors = path ? getRouteEntryFloors(path, navigation.graph.nodes) : {};
 			routeBuildings = buildingMaps.filter(({ id }) => entryFloors[id] !== undefined);
@@ -155,11 +264,24 @@
 		if (routeChanged) {
 			setVisibleBuildings();
 			updateDisplays();
-			if (routeStart) routeLayer!.fitFloor(routeStart.floor);
+			const gps = navigation.gpsLocation;
+			const onRoute =
+				gps.enabled &&
+				gps.position &&
+				isPositionOnRoute(
+					gps.position,
+					routeSegments,
+					view.activeFloors,
+					navigation.gps.routeTolerance
+				);
+			if (routeStart && !onRoute) {
+				// GPSの初回位置と出発地への飛行を競合させず、経路の表示後に追従へ渡します。
+				routeLayer!.fitFloor(routeStart.floor, !(gps.enabled || navigation.gps.requesting));
+			}
 		}
 		renderedHighlights = highlights;
 		poiLayer!.render(highlights);
-		markerLayer!.render(highlights);
+		markerLayer!.render(highlights, markerIds);
 		scheduleBuildingControls();
 		scheduleRouteLabels();
 	}
@@ -258,8 +380,12 @@
 		scheduleBuildingControls();
 		scheduleRouteLabels();
 	}
-	function updateMapState() {
+	function updateMapState(event: L.LeafletEvent | undefined = undefined) {
 		if (disposed || !svgLayersReady || adjustingSheet) return;
+		if (!event || event.type === 'resize') {
+			// 各段の入力・オプションを、文字サイズに合わせて収めます。
+			rootFontSize = parseFloat(getComputedStyle(document.documentElement).fontSize);
+		}
 		updateDisplays();
 	}
 	function switchFloor(buildingId: string, floor: number) {
@@ -276,6 +402,65 @@
 		const targetZoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), zoom));
 		const center = map.project([y, x], targetZoom).add([0, bottomSheetHeight / 2]);
 		map.flyTo(map.unproject(center, targetZoom), targetZoom, { duration: 1 });
+	}
+
+	function centerOnCurrentPosition(
+		position: MapPosition,
+		sheetHeight: number,
+		zoom = map!.getZoom()
+	) {
+		if (!map) return;
+		const snap = map.options.zoomSnap || 1;
+		const targetZoom = Math.max(
+			map.getMinZoom(),
+			Math.min(map.getMaxZoom(), Math.round(zoom / snap) * snap)
+		);
+		const center = map.project([position.y, position.x], targetZoom).add([0, sheetHeight / 2]);
+		map.stop();
+		map.setView(map.unproject(center, targetZoom), targetZoom, { animate: false });
+	}
+
+	function stopFollowing() {
+		followArmed = false;
+		pendingLocationFocus = false;
+		pendingRouteFocus = false;
+		appliedCurrentLocationRequest = navigation.currentLocationRequest;
+		interactedRoute = navigation.routePath;
+		appliedFocusRequest = navigation.focusRequest;
+		appliedFacilitySearch = navigation.facilitySearch;
+		map?.stop();
+		if (!mapContainer.querySelector('.leaflet-zoom-anim')) recordZoomEnd();
+	}
+	function recordZoomStart() {
+		mapZoom = null;
+	}
+	function recordZoomEnd() {
+		mapZoom = map?.getZoom() ?? null;
+	}
+
+	function observeUserInteraction(element: HTMLElement) {
+		const onInteraction = (event: Event) => {
+			if (event.target instanceof Element && event.target.closest('dialog')) return;
+			stopFollowing();
+		};
+		const onKey = (event: KeyboardEvent) => {
+			if (
+				['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', '+', '-', '=', 'Enter', ' '].includes(
+					event.key
+				)
+			)
+				onInteraction(event);
+		};
+		element.addEventListener('pointerdown', onInteraction, true);
+		element.addEventListener('wheel', onInteraction, { capture: true, passive: true });
+		element.addEventListener('keydown', onKey, true);
+		return {
+			destroy() {
+				element.removeEventListener('pointerdown', onInteraction, true);
+				element.removeEventListener('wheel', onInteraction, true);
+				element.removeEventListener('keydown', onKey, true);
+			}
+		};
 	}
 	export function focusOnPoiId(poiId: string) {
 		const target = navigation.resolvePoi(poiId);
@@ -306,12 +491,16 @@
 					maxBoundsViscosity: 1
 				});
 				map = mountedMap;
+				mountedMap.attributionControl.setPosition('bottomleft');
 				for (const [name, zIndex] of [
 					['floor-maps', 420],
-					['route-lines', 430]
+					['route-lines', 430],
+					['current-location', 640]
 				] as const) {
 					mountedMap.createPane(name).style.zIndex = String(zIndex);
 				}
+				mountedMap.getPane('current-location')!.style.pointerEvents = 'none';
+				locationLayer = createLocationLayer(leaflet, mountedMap);
 				svgLayers = createSvgLayers(
 					leaflet,
 					mountedMap,
@@ -358,6 +547,9 @@
 					poiLayer.enableSelection(layer, buildingId, floor);
 				svgLayersReady = true;
 				mountedMap.on('click', onMapClick);
+				mountedMap.on('dragstart', stopFollowing);
+				mountedMap.on('zoomstart', recordZoomStart);
+				mountedMap.on('zoomend', recordZoomEnd);
 				mountedMap.on('move zoom resize zoomend moveend', updateMapState);
 				mountedMap.on('move zoom resize tooltipopen tooltipclose', scheduleRouteLabels);
 				mountedMap.fitBounds(MAP_BOUNDS);
@@ -370,14 +562,19 @@
 		void initMap();
 		return () => {
 			disposed = true;
+			navigation.gps.stop();
 			svgLayersReady = false;
 			if (buildingControlFrame !== undefined) cancelAnimationFrame(buildingControlFrame);
 			if (routeLabelFrame !== undefined) cancelAnimationFrame(routeLabelFrame);
 			map?.off('move zoom resize zoomend moveend', updateMapState);
 			map?.off('click', onMapClick);
+			map?.off('dragstart', stopFollowing);
+			map?.off('zoomstart', recordZoomStart);
+			map?.off('zoomend', recordZoomEnd);
 			map?.off('move zoom resize tooltipopen tooltipclose', scheduleRouteLabels);
 			poiLayer?.dispose();
 			markerLayer?.dispose();
+			locationLayer?.dispose();
 			routeLayer?.dispose();
 			svgLayers?.dispose();
 			if (map) {
@@ -391,13 +588,45 @@
 </script>
 
 <div
+	use:observeUserInteraction
 	class={[
-		'map-wrapper relative isolate h-dvh w-full overflow-hidden [&_.leaflet-bottom.leaflet-right]:bottom-(--bottom-sheet-height)! [&_.leaflet-control-attribution]:mr-2!',
+		'map-wrapper relative isolate h-dvh w-full overflow-hidden [&_.leaflet-bottom]:bottom-(--bottom-sheet-height)! [&_.leaflet-control-attribution]:ml-2!',
 		bottomSheetSnap === 'top' && 'sheet-expanded'
 	]}
 	style:--bottom-sheet-height={`${bottomSheetHeight}px`}
 >
 	<div bind:this={mapContainer} class="map-container z-1 h-full w-full bg-[#898989]!"></div>
+	{#if bottomSheetSnap !== 'top'}
+		<button
+			type="button"
+			class="current-location-button absolute right-2 z-1000 flex size-11 items-center justify-center rounded-lg border border-slate-300 bg-white text-blue-700 shadow-md hover:bg-blue-50 disabled:cursor-not-allowed disabled:text-slate-400"
+			style:bottom={`calc(${bottomSheetHeight}px + 0.5rem)`}
+			aria-label="現在地に移動"
+			aria-pressed={followArmed && !!navigation.routePath && navigation.gpsLocation.enabled}
+			aria-busy={navigation.gpsLocation.enabled && !navigation.gpsLocation.position}
+			title={navigation.gpsLocation.enabled
+				? navigation.gpsLocation.position
+					? '現在地に移動'
+					: '現在地を取得中です'
+				: '現在地に移動'}
+			disabled={navigation.gpsLocation.enabled && !navigation.gpsLocation.position}
+			onclick={() => navigation.requestCurrentLocation()}
+		>
+			<svg
+				aria-hidden="true"
+				class="size-6"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+			>
+				<circle cx="12" cy="12" r="7" />
+				<circle cx="12" cy="12" r="2" />
+				<path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+			</svg>
+		</button>
+	{/if}
 	<BuildingFloorControls
 		buildings={controlBuildings}
 		positions={buildingControlPositions}
@@ -409,6 +638,8 @@
 	/>
 	<BottomSheet
 		bind:snap={bottomSheetSnap}
+		{peekHeight}
+		{middleMinHeight}
 		onheightchange={(height) => (bottomSheetHeight = height)}
 		onsettle={(snap, height) => {
 			bottomSheetHeight = height;
