@@ -13,6 +13,19 @@ afterEach(() => {
 });
 
 describe('RouteSearchPanel', () => {
+	it.each(['middle', 'top'] as const)(
+		'施設選択中もオプションを開かずに位置情報を明示停止できる (%s)',
+		async (snap) => {
+			const navigation = createNavigationState();
+			navigation.setHighlight('poi_hr_1-1');
+			navigation.setGpsLocation({ enabled: true, position: { x: 450, y: 500 } });
+			const { getByRole } = await render(RouteSearchPanel, { navigation, snap });
+			await getByRole('button', { name: '位置情報の利用を停止', exact: true }).click();
+			expect(navigation.gpsLocation).toEqual({ enabled: false });
+			expect(navigation.selectedPoi?.id).toBe('poi_hr_1-1');
+			expect(localStorage.getItem(LOCATION_CONSENT_KEY)).toBe('declined');
+		}
+	);
 	it('出発地に2I-HRを表示し、行き先を選ぶだけで検索できる', async () => {
 		const navigation = createNavigationState();
 		const { container, getByRole } = await render(RouteSearchPanel, { navigation, snap: 'middle' });

@@ -11,12 +11,12 @@ const references: GeolocationReferencePoint[] = [
 ];
 
 describe('geolocation projection', () => {
-	it('提供された衛星写真の3点を、SVGと上下反転した実際の地図の角へ対応させる', () => {
+	it('地理院地図から読み取った3点を、SVGと上下反転した校内図の角へ対応させる', () => {
 		const projection = createGeolocationProjection(geolocationReferencePoints)!;
 		const corners = [
-			{ latitude: 34.76902777777778, longitude: 135.62886111111112, x: 610, y: 133.5 },
-			{ latitude: 34.7705, longitude: 135.63072222222223, x: 1250, y: 843.5 },
-			{ latitude: 34.77019444444444, longitude: 135.6288888888889, x: 581, y: 672.5 }
+			{ latitude: 34.769008, longitude: 135.628851, x: 610, y: 133.5 },
+			{ latitude: 34.770464, longitude: 135.630723, x: 1250, y: 843.5 },
+			{ latitude: 34.770153, longitude: 135.628901, x: 581, y: 672.5 }
 		];
 		for (const corner of corners) {
 			const actual = projection.project(corner)!;

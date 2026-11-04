@@ -70,6 +70,16 @@ export function createGeolocationState({
 	}
 	const hasConsent = () => readDecision() === 'accepted';
 
+	function saveDecision(next: 'accepted' | 'declined') {
+		decision = next;
+		try {
+			getEnvironment().storage?.setItem(LOCATION_CONSENT_KEY, next);
+		} catch {
+			// 保存できない場合も、この画面では利用者の選択を保持します。
+		}
+	}
+
+	/** 自動停止・エラー・破棄では、利用するかどうかの選択は変更しません。 */
 	function stop() {
 		generation++;
 		clearAccuracyWait();
@@ -202,13 +212,13 @@ export function createGeolocationState({
 		confirmConsent(allow: boolean) {
 			if (!consentOpen) return;
 			consentOpen = false;
-			decision = allow ? 'accepted' : 'declined';
-			try {
-				getEnvironment().storage?.setItem(LOCATION_CONSENT_KEY, decision);
-			} catch {
-				// 利用するかの選択結果以外は保存しません。
-			}
+			saveDecision(allow ? 'accepted' : 'declined');
 			finishRequest(allow);
+		},
+		/** 明示的に停止した後は、現在地ボタンで選び直すまで測位を再開しません。 */
+		disable() {
+			saveDecision('declined');
+			stop();
 		},
 		hasConsent,
 		stop,

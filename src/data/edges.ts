@@ -2390,5 +2390,10 @@ export const edges: Edges = [
 		fromNode: 'node_staircase_f1_ee_north',
 		toNode: 'node_outdoor_f0_staircase',
 		isStairs: false
+	},
+	{
+		fromNode: 'node_skybridge_f2_ee_se',
+		toNode: 'node_outdoor_f0_ee_slope_skybridge_f2',
+		isStairs: false
 	}
 ];

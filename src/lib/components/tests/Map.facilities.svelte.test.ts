@@ -98,6 +98,11 @@ describe('Map facility controls', () => {
 		expect(
 			container.querySelector('.leaflet-bottom.leaflet-right .leaflet-control-attribution')
 		).toBeNull();
+		const source = container.querySelector<HTMLAnchorElement>(
+			'.leaflet-control-attribution a[href="https://maps.gsi.go.jp/development/ichiran.html"]'
+		)!;
+		expect(source.textContent).toBe('地理院地図');
+		expect(source.closest('.leaflet-control-attribution')!.textContent).toContain('位置補正基準点');
 		const gap = () =>
 			Math.abs(sheet.getBoundingClientRect().top - button.getBoundingClientRect().bottom - 8);
 		await expect.poll(gap).toBeLessThan(1);

@@ -32,6 +32,9 @@
 	let optionsOpen = $state(false);
 	let panelHeight = $state(0);
 	const expanded = $derived(snap !== 'bottom');
+	const showGpsStop = $derived(
+		navigation.gpsLocation.enabled || navigation.gps.requesting || navigation.gps.error !== null
+	);
 	const poi = $derived(navigation.selectedPoi);
 	const location = $derived(poi ? navigation.resolvePoi(poi.id) : undefined);
 	const building = $derived(
@@ -59,7 +62,7 @@
 	const resultsMaxHeight = $derived(snap === 'top' ? 'max(8rem, calc(100dvh - 20rem))' : '10rem');
 
 	$effect(() => {
-		contentMinHeight = expanded && !poi && optionsOpen ? panelHeight : undefined;
+		contentMinHeight = expanded && ((!poi && optionsOpen) || showGpsStop) ? panelHeight : undefined;
 	});
 
 	$effect(() => {
@@ -312,6 +315,15 @@
 			{navigation.gps.error}
 		</p>
 	{/if}
+	{#if expanded && showGpsStop}
+		<div class="mt-3 flex justify-end">
+			<button
+				type="button"
+				class="min-h-11 rounded-lg px-3 py-2 text-sm text-slate-600 hover:bg-slate-100"
+				onclick={() => navigation.gps.disable()}>位置情報の利用を停止</button
+			>
+		</div>
+	{/if}
 	{#if snap === 'top'}
 		<div
 			class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-3 text-sm"
@@ -323,13 +335,6 @@
 				class="min-h-11 py-2 text-blue-700 underline underline-offset-4"
 				>位置情報の取り扱い（別タブ）</a
 			>
-			{#if navigation.gpsLocation.enabled}
-				<button
-					type="button"
-					class="min-h-11 rounded-lg px-3 py-2 text-slate-600 hover:bg-slate-100"
-					onclick={() => navigation.gps.stop()}>位置情報の利用を停止</button
-				>
-			{/if}
 		</div>
 	{/if}
 </div>
