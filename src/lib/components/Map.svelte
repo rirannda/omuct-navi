@@ -30,6 +30,8 @@
 	import RouteSearchPanel from './layout/RouteSearchPanel.svelte';
 
 	let { navigation }: { navigation: NavigationState } = $props();
+	const projectDisclaimer =
+		'omuct-naviは !MS チームが総合課題実習の一環として作成したソフトウェアです。高専祭運営の公式情報ではないため間違っている場合があります。';
 	const id = $props.id();
 	const locationHintId = `${id}-location-stop-hint`;
 	const showLocationHint = $derived(
@@ -607,6 +609,11 @@
 >
 	<div bind:this={mapContainer} class="map-container z-1 h-full w-full bg-[#898989]!"></div>
 	{#if bottomSheetSnap !== 'top'}
+		<p
+			class="pointer-events-none absolute top-2.5 right-2.5 left-14 z-1000 rounded border-2 border-yellow-400/90 bg-yellow-500/40 p-1 text-sm text-white"
+		>
+			{projectDisclaimer}
+		</p>
 		<div
 			class="pointer-events-none absolute right-2 z-1000 flex max-w-[calc(100%-1rem)] items-center gap-2"
 			style:bottom={`calc(${bottomSheetHeight}px + ${showLocationHint ? '2rem' : '0.5rem'})`}
@@ -623,7 +630,7 @@
 								? '位置情報を取得中です。'
 								: '位置情報の利用を確認中です。'}</span
 					>
-					<span class="block">停止は下のシートから。</span>
+					<span class="block">停止は下のシートからできます。</span>
 				</p>
 			{/if}
 			<button
@@ -677,11 +684,23 @@
 			settledSheetSnap = snap;
 		}}
 	>
-		<RouteSearchPanel
-			{navigation}
-			bind:snap={bottomSheetSnap}
-			bind:contentMinHeight={sheetContentMinHeight}
-		/>
+		<div class={bottomSheetSnap === 'top' ? 'flex min-h-full flex-col' : undefined}>
+			<RouteSearchPanel
+				{navigation}
+				bind:snap={bottomSheetSnap}
+				bind:contentMinHeight={sheetContentMinHeight}
+			/>
+			{#if bottomSheetSnap === 'top'}
+				<footer class="mx-auto mt-auto w-full max-w-2xl">
+					<p class="rounded border-2 border-yellow-500/80 bg-yellow-500/40 p-1 text-sm text-gray-800">
+						{projectDisclaimer}
+					</p>
+					<a href="https://fes2026.omuct-gakuyukai.com/" target="_blank" rel="noopener noreferrer" class="border-b">
+						第62回高専祭特設サイト(別タブ)
+					</a>
+				</footer>
+			{/if}
+		</div>
 	</BottomSheet>
 </div>
 
