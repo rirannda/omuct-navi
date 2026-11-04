@@ -9,11 +9,14 @@
 
 	let {
 		snap = $bindable<BottomSheetSnap>('bottom'),
+		contentMinHeight,
 		onheightchange,
 		onsettle,
 		children
 	}: {
 		snap?: BottomSheetSnap;
+		/** 中段で内容をスクロールなしで見せるために必要な内容の高さ(px)。中段の高さがこれに満たない場合だけ広げます。 */
+		contentMinHeight?: number;
 		/** アニメーション・ドラッグ中も、画面を覆っている高さを通知します。 */
 		onheightchange?: (height: number) => void;
 		onsettle?: (snap: BottomSheetSnap, height: number) => void;
@@ -26,6 +29,8 @@
 	const id = $props.id();
 	const contentId = `${id}-content`;
 	let availableHeight = $state(0);
+	let handle: HTMLElement | undefined;
+	let content: HTMLElement | undefined;
 	let height = $state(BOTTOM_SHEET_PEEK_HEIGHT);
 	let dragging = $state(false);
 	let animationFrame: number | undefined;
@@ -41,9 +46,21 @@
 	function snapHeight(position: BottomSheetSnap): number {
 		const maximum = availableHeight || BOTTOM_SHEET_PEEK_HEIGHT;
 		if (position === 'top') return maximum;
-		if (position === 'middle')
-			return Math.min(maximum, Math.max(MIDDLE_MIN_HEIGHT, maximum * MIDDLE_HEIGHT_RATIO));
+		if (position === 'middle') {
+			const base = Math.max(MIDDLE_MIN_HEIGHT, maximum * MIDDLE_HEIGHT_RATIO);
+			return Math.min(
+				maximum,
+				Math.max(base, contentMinHeight ? contentMinHeight + chromeHeight() : 0)
+			);
+		}
 		return Math.min(BOTTOM_SHEET_PEEK_HEIGHT, maximum);
+	}
+
+	/** 内容領域以外(つまみ・内容領域の上下パディング)が占める高さ。 */
+	function chromeHeight(): number {
+		if (!handle || !content) return 0;
+		const { paddingTop, paddingBottom } = getComputedStyle(content);
+		return handle.offsetHeight + parseFloat(paddingTop) + parseFloat(paddingBottom);
 	}
 
 	function cancelAnimation() {
@@ -74,6 +91,7 @@
 		// 親領域のリサイズ時も、現在のスナップ位置に合わせ直します。
 		const position = snap;
 		const maximum = availableHeight;
+		void contentMinHeight;
 		if (maximum && !dragging) untrack(() => animateTo(snapHeight(position)));
 	});
 	$effect(() => {
@@ -147,6 +165,7 @@
 		aria-label="ボトムシート"
 	>
 		<button
+			bind:this={handle}
 			class={[
 				'drag-handle flex w-full flex-[0_0_48px] touch-none items-center justify-center rounded-t-3xl border-0 bg-transparent p-0 select-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-[#2563eb] focus-visible:outline-solid',
 				dragging ? 'cursor-grabbing' : 'cursor-grab'
@@ -165,6 +184,7 @@
 			<span class="h-1 w-9 rounded-full bg-[#b8bdc5]" aria-hidden="true"></span>
 		</button>
 		<div
+			bind:this={content}
 			class="sheet-content min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-1 pb-[max(16px,env(safe-area-inset-bottom))]"
 			id={contentId}
 		>

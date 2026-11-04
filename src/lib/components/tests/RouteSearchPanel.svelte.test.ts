@@ -85,11 +85,12 @@ describe('RouteSearchPanel', () => {
 			});
 			navigation.setHighlight('poi_hr_1-1', 'start');
 			navigation.setHighlight('poi_hr_2m', 'goal');
-			const { container, getByRole } = await render(RouteSearchPanel, {
+			const { container, getByRole, getByText } = await render(RouteSearchPanel, {
 				navigation,
 				snap: 'middle'
 			});
 			await getByRole('button', { name: 'ルート検索', exact: true }).click();
+			await getByText('オプション', { exact: true }).click();
 			expect(navigation.routePath).toEqual([from.id, to.id]);
 			await getByRole('switch', { name: 'バリアフリー' }).click();
 			expect(container.querySelector('[role="switch"]')?.getAttribute('aria-checked')).toBe('true');

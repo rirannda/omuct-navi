@@ -99,4 +99,21 @@ describe('BottomSheet', () => {
 		await button.click();
 		await expect.poll(() => sheet.getBoundingClientRect().height).toBe(144);
 	});
+
+	it('内容の必要高さが中段を超える場合だけ、中段を内容に合わせて広げる', async () => {
+		const { container, sheet, getByRole, rerender } = await renderSheet();
+		await rerender({ contentMinHeight: 300 });
+		await getByRole('button', { name: 'ボトムシートの高さを変更' }).click();
+		await expect.poll(() => sheet.getBoundingClientRect().height).toBeCloseTo(470.4, 1);
+		const content = container.querySelector<HTMLElement>('.sheet-content')!;
+		const { paddingTop, paddingBottom } = getComputedStyle(content);
+		const chrome = 48 + parseFloat(paddingTop) + parseFloat(paddingBottom);
+		await rerender({ contentMinHeight: 600 });
+		await expect.poll(() => sheet.getBoundingClientRect().height).toBeCloseTo(600 + chrome, 1);
+		expect(sheet.dataset.snap).toBe('middle');
+		await rerender({ contentMinHeight: 2000 });
+		await expect.poll(() => sheet.getBoundingClientRect().height).toBe(784);
+		await rerender({ contentMinHeight: undefined });
+		await expect.poll(() => sheet.getBoundingClientRect().height).toBeCloseTo(470.4, 1);
+	});
 });

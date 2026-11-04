@@ -46,6 +46,7 @@
 	let bottomSheetSnap = $state<BottomSheetSnap>('bottom');
 	let settledSheetSnap = $state<BottomSheetSnap>('bottom');
 	let appliedFocusRequest: NavigationState['focusRequest'] = null;
+	let sheetContentMinHeight = $state<number>();
 	let bottomSheetHeight = $state(BOTTOM_SHEET_PEEK_HEIGHT);
 	let previousSheetSnap: BottomSheetSnap = 'bottom';
 	let previousSheetHeight = BOTTOM_SHEET_PEEK_HEIGHT;
@@ -409,13 +410,18 @@
 	/>
 	<BottomSheet
 		bind:snap={bottomSheetSnap}
+		contentMinHeight={sheetContentMinHeight}
 		onheightchange={(height) => (bottomSheetHeight = height)}
 		onsettle={(snap, height) => {
 			bottomSheetHeight = height;
 			settledSheetSnap = snap;
 		}}
 	>
-		<RouteSearchPanel {navigation} bind:snap={bottomSheetSnap} />
+		<RouteSearchPanel
+			{navigation}
+			bind:snap={bottomSheetSnap}
+			bind:contentMinHeight={sheetContentMinHeight}
+		/>
 	</BottomSheet>
 </div>
 

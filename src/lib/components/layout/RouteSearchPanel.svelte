@@ -9,10 +9,15 @@
 
 	let {
 		navigation = requireNavigation(),
-		snap = $bindable<BottomSheetSnap>('bottom')
+		snap = $bindable<BottomSheetSnap>('bottom'),
+		// 親へ値を渡す出力専用の bindable のため、読み取りはない。
+		// eslint-disable-next-line no-useless-assignment
+		contentMinHeight = $bindable()
 	}: {
 		navigation?: NavigationState;
 		snap?: BottomSheetSnap;
+		/** オプション展開時に、内容をスクロールなしで見せるために必要な高さ。 */
+		contentMinHeight?: number;
 	} = $props();
 
 	type Role = 'start' | 'goal';
@@ -20,6 +25,8 @@
 	let startQuery = $state('');
 	let goalQuery = $state('');
 	let errorMessage = $state<HTMLParagraphElement>();
+	let optionsOpen = $state(false);
+	let panelHeight = $state(0);
 	const expanded = $derived(snap !== 'bottom');
 	const poi = $derived(navigation.selectedPoi);
 	const location = $derived(poi ? navigation.resolvePoi(poi.id) : undefined);
@@ -44,6 +51,10 @@
 	);
 	const resultsMaxHeight = $derived(snap === 'top' ? 'max(8rem, calc(100dvh - 20rem))' : '10rem');
 
+	$effect(() => {
+		// 展開中にオプションを開いている間だけ、シートに必要な高さを伝える。
+		contentMinHeight = expanded && optionsOpen ? panelHeight : undefined;
+	});
 	$effect(() => {
 		if (start) startQuery = start.poi.name;
 	});
@@ -89,7 +100,10 @@
 	}
 </script>
 
-<div class="route-search-panel mx-auto w-full max-w-2xl text-slate-900">
+<div
+	class="route-search-panel mx-auto w-full max-w-2xl text-slate-900"
+	bind:clientHeight={panelHeight}
+>
 	{#if poi}
 		<section aria-label="選択した施設の情報" class={expanded ? 'space-y-4' : 'space-y-1'}>
 			<div class="flex items-start justify-between gap-3">
@@ -194,34 +208,6 @@
 							onselect={(poiId) => select('goal', poiId)}
 						/>
 					</div>
-					<button
-						type="button"
-						role="switch"
-						aria-label="バリアフリー"
-						aria-checked={navigation.barrierFree}
-						aria-describedby={`${id}-barrier-free-hint`}
-						class="flex min-h-13 shrink-0 flex-col items-center justify-center gap-1 rounded-lg px-1 text-xs font-medium text-slate-600 focus-visible:outline-2 focus-visible:outline-blue-600"
-						onclick={() => navigation.setBarrierFree(!navigation.barrierFree)}
-					>
-						<span>バリアフリー</span>
-						<span
-							aria-hidden="true"
-							class={[
-								'flex h-6 w-11 items-center rounded-full p-0.5 transition-colors',
-								navigation.barrierFree ? 'bg-blue-600' : 'bg-slate-300'
-							]}
-						>
-							<span
-								class={[
-									'size-5 rounded-full bg-white shadow-sm transition-transform',
-									navigation.barrierFree && 'translate-x-5'
-								]}
-							></span>
-						</span>
-					</button>
-					<span id={`${id}-barrier-free-hint`} class="sr-only"
-						>階段を使わない経路を検索します。</span
-					>
 				</div>
 			</div>
 			{#if expanded}
@@ -239,6 +225,45 @@
 						>
 					{/if}
 				</div>
+				<details class="group" bind:open={optionsOpen}>
+					<summary
+						class="flex min-h-11 w-fit cursor-pointer list-none items-center gap-1 text-sm font-medium text-blue-600 focus-visible:outline-2 focus-visible:outline-blue-600 [&::-webkit-details-marker]:hidden"
+						>オプション<span
+							aria-hidden="true"
+							class="text-xs transition-transform group-open:rotate-180">▾</span
+						></summary
+					>
+					<div class="pb-2">
+						<button
+							type="button"
+							role="switch"
+							aria-label="バリアフリー"
+							aria-checked={navigation.barrierFree}
+							aria-describedby={`${id}-barrier-free-hint`}
+							class="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg text-sm font-medium text-slate-600 focus-visible:outline-2 focus-visible:outline-blue-600"
+							onclick={() => navigation.setBarrierFree(!navigation.barrierFree)}
+						>
+							<span>バリアフリー</span>
+							<span
+								aria-hidden="true"
+								class={[
+									'flex h-6 w-11 items-center rounded-full p-0.5 transition-colors',
+									navigation.barrierFree ? 'bg-blue-600' : 'bg-slate-300'
+								]}
+							>
+								<span
+									class={[
+										'size-5 rounded-full bg-white shadow-sm transition-transform',
+										navigation.barrierFree && 'translate-x-5'
+									]}
+								></span>
+							</span>
+						</button>
+						<span id={`${id}-barrier-free-hint`} class="sr-only"
+							>階段を使わない経路を検索します。</span
+						>
+					</div>
+				</details>
 			{/if}
 		</form>
 	{/if}
