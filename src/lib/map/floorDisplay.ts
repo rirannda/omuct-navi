@@ -1,4 +1,5 @@
 import { buildingMaps } from '../../data/maps';
+import { buildingFloorLabels } from '../../data/buildings';
 import type { BuildingMap } from '../../data/maps';
 
 export function getFloorOrder(building: BuildingMap): number[] {
@@ -10,7 +11,9 @@ export function getFloorOrder(building: BuildingMap): number[] {
 }
 
 export function formatFloorLabel(buildingId: string, floor: number, compact = true): string {
-	const custom = buildingMaps.find(({ id }) => id === buildingId)?.floorLabels?.[floor];
+	const custom =
+		buildingMaps.find(({ id }) => id === buildingId)?.floorLabels?.[floor] ??
+		buildingFloorLabels[buildingId]?.[floor];
 	if (custom) return custom;
 	if (compact) return floor < 0 ? `B${-floor}` : `${floor}F`;
 	return floor < 0 ? `地下${-floor}階` : `${floor}階`;

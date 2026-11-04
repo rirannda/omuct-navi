@@ -1,6 +1,6 @@
 <script module lang="ts">
 	export type BottomSheetSnap = 'bottom' | 'middle' | 'top';
-	export const BOTTOM_SHEET_PEEK_HEIGHT = 144;
+	export const BOTTOM_SHEET_PEEK_HEIGHT = 120;
 </script>
 
 <script lang="ts">
@@ -9,13 +9,19 @@
 
 	let {
 		snap = $bindable<BottomSheetSnap>('bottom'),
+		peekHeight = BOTTOM_SHEET_PEEK_HEIGHT,
+		middleMinHeight = 320,
 		contentMinHeight,
 		onheightchange,
 		onsettle,
 		children
 	}: {
 		snap?: BottomSheetSnap;
-		/** 中段で内容をスクロールなしで見せるために必要な内容の高さ(px)。中段の高さがこれに満たない場合だけ広げます。 */
+		/** 下段の操作欄を収める高さ。表示領域の高さで上限を設けます。 */
+		peekHeight?: number;
+		/** 中段の操作欄を収める最低高。表示領域の高さで上限を設けます。 */
+		middleMinHeight?: number;
+		/** 中段でスクロールなしで見せるために必要な内容の高さ。 */
 		contentMinHeight?: number;
 		/** アニメーション・ドラッグ中も、画面を覆っている高さを通知します。 */
 		onheightchange?: (height: number) => void;
@@ -25,13 +31,12 @@
 
 	const snaps: readonly BottomSheetSnap[] = ['bottom', 'middle', 'top'];
 	const MIDDLE_HEIGHT_RATIO = 0.3;
-	const MIDDLE_MIN_HEIGHT = 320;
 	const id = $props.id();
 	const contentId = `${id}-content`;
 	let availableHeight = $state(0);
-	let handle: HTMLElement | undefined;
-	let content: HTMLElement | undefined;
-	let height = $state(BOTTOM_SHEET_PEEK_HEIGHT);
+	let handle: HTMLButtonElement | undefined;
+	let content: HTMLDivElement | undefined;
+	let height = $state(untrack(() => peekHeight));
 	let dragging = $state(false);
 	let animationFrame: number | undefined;
 	let pointerId: number | undefined;
@@ -44,19 +49,20 @@
 	let suppressClick = false;
 
 	function snapHeight(position: BottomSheetSnap): number {
-		const maximum = availableHeight || BOTTOM_SHEET_PEEK_HEIGHT;
+		const maximum = availableHeight || peekHeight;
 		if (position === 'top') return maximum;
-		if (position === 'middle') {
-			const base = Math.max(MIDDLE_MIN_HEIGHT, maximum * MIDDLE_HEIGHT_RATIO);
+		if (position === 'middle')
 			return Math.min(
 				maximum,
-				Math.max(base, contentMinHeight ? contentMinHeight + chromeHeight() : 0)
+				Math.max(
+					middleMinHeight,
+					maximum * MIDDLE_HEIGHT_RATIO,
+					contentMinHeight ? contentMinHeight + chromeHeight() : 0
+				)
 			);
-		}
-		return Math.min(BOTTOM_SHEET_PEEK_HEIGHT, maximum);
+		return Math.min(peekHeight, maximum);
 	}
 
-	/** 内容領域以外(つまみ・内容領域の上下パディング)が占める高さ。 */
 	function chromeHeight(): number {
 		if (!handle || !content) return 0;
 		const { paddingTop, paddingBottom } = getComputedStyle(content);
@@ -90,9 +96,8 @@
 	$effect(() => {
 		// 親領域のリサイズ時も、現在のスナップ位置に合わせ直します。
 		const position = snap;
-		const maximum = availableHeight;
-		void contentMinHeight;
-		if (maximum && !dragging) untrack(() => animateTo(snapHeight(position)));
+		const target = snapHeight(position);
+		if (availableHeight && !dragging) untrack(() => animateTo(target));
 	});
 	$effect(() => {
 		const currentHeight = height;

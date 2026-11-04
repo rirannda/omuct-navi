@@ -27,7 +27,13 @@ function mockMaps(ready: Promise<void> = Promise.resolve()) {
 }
 
 async function renderMap() {
-	const navigation = createNavigationState();
+	const base = createNavigationState();
+	const navigation = createNavigationState({
+		graph: base.graph,
+		pois: base.pois,
+		markers: base.markers,
+		config: { mode: 'normal' }
+	});
 	const rendered = await render(Map, { props: { navigation } });
 	return { ...rendered, navigation };
 }

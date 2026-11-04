@@ -14,6 +14,7 @@ describe('marker data', () => {
 			expect(Number.isFinite(marker.x) && Number.isFinite(marker.y), marker.id).toBe(true);
 			expect(Number.isInteger(marker.floor), marker.id).toBe(true);
 			expect(marker.buildingId.trim(), marker.id).not.toBe('');
+			expect(['always', 'floor'], marker.id).toContain(marker.visibility);
 		}
 	});
 });

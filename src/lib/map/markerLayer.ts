@@ -5,7 +5,6 @@ import { buildingNames } from '../../data/buildings';
 import type { PoiHighlights } from '../states/navigation.svelte';
 import { highlightRoles } from './highlightColors';
 import { formatFloorLabel } from './floorDisplay';
-import { getAvailableFloor } from './state/floors';
 
 /** 静的SVGとは独立した、選択可能な施設アイコンを管理します。 */
 export function createMarkerLayer(
@@ -13,11 +12,15 @@ export function createMarkerLayer(
 	map: L.Map,
 	markers: readonly MapMarker[],
 	buildings: readonly BuildingMap[],
-	getView: () => { activeFloors: Readonly<Record<string, number>> },
+	getView: () => {
+		activeFloors: Readonly<Record<string, number>>;
+		visibleBuildings: readonly BuildingMap[];
+	},
 	onSelect: (id: string) => void
 ) {
 	const byBuilding = new Map(buildings.map((building) => [building.id, building]));
 	let highlights: PoiHighlights = {};
+	let visibleMarkerIds: Set<string> | null = null;
 	let disposed = false;
 	const entries = markers.map((data) => {
 		const symbol = document.createElement('span');
@@ -75,20 +78,20 @@ export function createMarkerLayer(
 
 	function updateVisible() {
 		if (disposed) return;
-		const { activeFloors } = getView();
+		const { activeFloors, visibleBuildings } = getView();
+		const displayedBuildings = new Set(visibleBuildings.map(({ id }) => id));
 		for (const { data, layer } of entries) {
-			const building = byBuilding.get(data.buildingId);
-			// 詳細図がない施設も全体図上に表示します。詳細図がある階は選択階に合わせます。
+			const role = highlightRoles.findLast((role) => highlights[role] === data.id);
+			// 階の選択履歴だけでなく、現在その建物の詳細図を表示しているかも確認します。
 			const visible =
 				data.buildingId === 'outdoor' ||
-				!building?.floors[data.floor] ||
-				data.floor === (activeFloors[data.buildingId] ?? getAvailableFloor(building, 1));
-			if (!visible) {
+				data.visibility === 'always' ||
+				(displayedBuildings.has(data.buildingId) && data.floor === activeFloors[data.buildingId]);
+			if (!visible || (visibleMarkerIds && !visibleMarkerIds.has(data.id) && !role)) {
 				layer.remove();
 				continue;
 			}
 			if (!map.hasLayer(layer)) layer.addTo(map);
-			const role = highlightRoles.findLast((role) => highlights[role] === data.id);
 			const element = layer.getElement()!;
 			for (const color of highlightRoles) element.classList.remove(`poi-color-${color}`);
 			element.classList.toggle('facility-marker-highlight', !!role);
@@ -109,8 +112,9 @@ export function createMarkerLayer(
 
 	return {
 		has: (id: string) => byId.has(id),
-		render: (next: PoiHighlights) => {
+		render: (next: PoiHighlights, markerIds: readonly string[] | null = null) => {
 			highlights = next;
+			visibleMarkerIds = markerIds ? new Set(markerIds) : null;
 			updateVisible();
 		},
 		updateVisible,

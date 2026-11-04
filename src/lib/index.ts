@@ -1,4 +1,26 @@
-export type { Poi, MapMarker, Destination, DestinationLocation } from '../data/types';
+export type {
+	Poi,
+	MapMarker,
+	Destination,
+	DestinationLocation,
+	ToiletType,
+	MapDataConfig
+} from '../data/types';
+export type {
+	FacilityCategory,
+	FacilitySearch,
+	FacilityOrigin,
+	GpsLocation
+} from './map/nearbyFacilities';
+export { findNearbyFacilities, MAX_NEARBY_FACILITIES } from './map/nearbyFacilities';
+export type {
+	MapPosition,
+	GeographicPosition,
+	GeolocationReferencePoint,
+	GeolocationProjection
+} from './map/geolocationProjection';
+export { createGeolocationProjection } from './map/geolocationProjection';
+export { isPositionOnRoute } from './map/routePosition';
 export type { BottomSheetSnap } from './components/BottomSheet.svelte';
 export { default as BottomSheet, BOTTOM_SHEET_PEEK_HEIGHT } from './components/BottomSheet.svelte';
 export type { ConnectedFloorLookup } from './map/connectedFloors';

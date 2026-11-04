@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { Destination } from '#lib';
+	import { singleLineDestinationName } from '../../destinationName';
 
 	let {
 		results,
@@ -42,7 +43,7 @@
 					onclick={() => onselect(poi)}
 					onpointerdown={(event) => event.preventDefault()}
 				>
-					{poi.name}
+					{singleLineDestinationName(poi.name)}
 				</button>
 			</li>
 		{/each}

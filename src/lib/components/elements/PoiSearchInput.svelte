@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { HTMLInputAttributes } from 'svelte/elements';
 	import type { Destination } from '#lib';
+	import { singleLineDestinationName } from '../../destinationName';
 	import PoiSearchList from '#lib/components/elements/PoiSearchList.svelte';
 	import Fuse from 'fuse.js';
 	import { pois } from '../../../data/pois';
@@ -41,12 +42,15 @@
 
 	const MAX_RESULTS = 20;
 	const fuse = $derived(
-		new Fuse(destinations, {
-			keys: ['name', 'keys'],
-			useTokenSearch: true,
-			threshold: 0.3,
-			ignoreLocation: true
-		})
+		new Fuse(
+			destinations.map((poi) => ({ ...poi, name: singleLineDestinationName(poi.name) })),
+			{
+				keys: ['name', 'keys'],
+				useTokenSearch: true,
+				threshold: 0.3,
+				ignoreLocation: true
+			}
+		)
 	);
 
 	let open = $state(false);
@@ -69,7 +73,7 @@
 	}
 
 	function select(poi: Destination) {
-		query = poi.name;
+		query = singleLineDestinationName(poi.name);
 		close();
 		onselect(poi.id);
 		input.blur();
@@ -98,7 +102,7 @@
 		<input
 			bind:this={input}
 			type="search"
-			class="min-h-13 w-full min-w-0 rounded-xl border border-slate-300 bg-slate-50 py-3 pr-12 pl-4 text-base text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 [&::-webkit-search-cancel-button]:hidden"
+			class="min-h-13 w-full min-w-0 rounded-4xl border border-slate-300 bg-slate-50 py-3 pr-12 pl-4 text-base text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 [&::-webkit-search-cancel-button]:hidden"
 			{placeholder}
 			aria-label={label}
 			autocomplete="off"

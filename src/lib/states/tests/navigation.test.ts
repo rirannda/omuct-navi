@@ -32,6 +32,7 @@ describe('navigation state', () => {
 		description: '2階、入口から右',
 		icon: toiletIcon,
 		buildingId: 'admin',
+		visibility: 'floor',
 		floor: 2,
 		x: 100,
 		y: 200
