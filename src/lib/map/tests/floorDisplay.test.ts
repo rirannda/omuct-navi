@@ -22,6 +22,7 @@ describe('floor display', () => {
 		expect(getFloorOrder(building)).toEqual([1, 0]);
 		expect(formatFloorLabel('cafe', 0)).toBe('地上');
 		expect(formatFloorLabel('cafe', 0, false)).toBe('地上');
+		expect(formatFloorLabel('admin', 0, false)).toBe('階不明');
 		expect(building.floors[0]).toBe('cafe_B1.svg');
 		expect(formatFloorLabel('la', 2)).toBe('2F');
 		expect(formatFloorLabel('la', 2, false)).toBe('2階');

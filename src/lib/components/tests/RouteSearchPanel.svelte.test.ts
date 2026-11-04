@@ -1,12 +1,31 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render } from 'vitest-browser-svelte';
 import { userEvent } from 'vitest/browser';
 import RouteSearchPanel from '../layout/RouteSearchPanel.svelte';
 import { createNavigationState } from '../../states/navigation.svelte';
+import { LOCATION_CONSENT_KEY } from '../../states/geolocation.svelte';
 
-afterEach(() => vi.restoreAllMocks());
+// このスイートは位置情報を使わない手動の経路検索を検証します。
+beforeEach(() => localStorage.setItem(LOCATION_CONSENT_KEY, 'declined'));
+afterEach(() => {
+	localStorage.removeItem(LOCATION_CONSENT_KEY);
+	vi.restoreAllMocks();
+});
 
 describe('RouteSearchPanel', () => {
+	it.each(['middle', 'top'] as const)(
+		'施設選択中もオプションを開かずに位置情報を明示停止できる (%s)',
+		async (snap) => {
+			const navigation = createNavigationState();
+			navigation.setHighlight('poi_hr_1-1');
+			navigation.setGpsLocation({ enabled: true, position: { x: 450, y: 500 } });
+			const { getByRole } = await render(RouteSearchPanel, { navigation, snap });
+			await getByRole('button', { name: '位置情報の利用を停止', exact: true }).click();
+			expect(navigation.gpsLocation).toEqual({ enabled: false });
+			expect(navigation.selectedPoi?.id).toBe('poi_hr_1-1');
+			expect(localStorage.getItem(LOCATION_CONSENT_KEY)).toBe('declined');
+		}
+	);
 	it('出発地に2I-HRを表示し、行き先を選ぶだけで検索できる', async () => {
 		const navigation = createNavigationState();
 		const { container, getByRole } = await render(RouteSearchPanel, { navigation, snap: 'middle' });
@@ -91,6 +110,7 @@ describe('RouteSearchPanel', () => {
 			});
 			await getByRole('button', { name: 'ルート検索', exact: true }).click();
 			expect(navigation.routePath).toEqual([from.id, to.id]);
+			container.querySelector('summary')!.click();
 			await getByRole('switch', { name: 'バリアフリー' }).click();
 			expect(container.querySelector('[role="switch"]')?.getAttribute('aria-checked')).toBe('true');
 			if (hasDetour) {
@@ -140,6 +160,65 @@ describe('RouteSearchPanel', () => {
 			true
 		);
 		await expect.poll(() => container.textContent).toContain('一致する場所がありません。');
+	});
+
+	it('改行を含む施設名は検索と経路指定では空白にし、詳細では改行を表示する', async () => {
+		const base = createNavigationState();
+		const name = '土曜:サシェ [土に親しむ会]\n日曜:シロフォン [Space Design Club]';
+		const singleLineName = '土曜:サシェ [土に親しむ会] 日曜:シロフォン [Space Design Club]';
+		const navigation = createNavigationState({
+			graph: base.graph,
+			pois: base.pois.map((poi) =>
+				poi.id === 'poi_hr_1-1' ? { ...poi, name, keys: ['サシェ', 'シロフォン'] } : poi
+			)
+		});
+		const { container, getByRole } = await render(RouteSearchPanel, {
+			navigation,
+			snap: 'middle'
+		});
+		const goal = getByRole('combobox', { name: '行き先', exact: true });
+		await goal.fill('サシェ');
+		await getByRole('button', { name: singleLineName, exact: true }).click();
+		await expect
+			.poll(() => container.querySelector<HTMLInputElement>('input[aria-label="行き先"]')?.value)
+			.toBe(singleLineName);
+		expect(navigation.highlights.goal).toBe('poi_hr_1-1');
+		await getByRole('button', { name: 'ルート検索', exact: true }).click();
+		expect(navigation.routePath?.at(-1)).toBe('node_la_f1_hr_1-1');
+
+		navigation.setHighlight('poi_hr_1-1');
+		await expect.poll(() => container.querySelector('h2')?.textContent).toBe(name);
+		expect(getComputedStyle(container.querySelector('h2')!).whiteSpace).toBe('pre-line');
+	});
+
+	it('出発地と行き先の改行名を1行で検索・表示して経路を指定し、元の改行は保持する', async () => {
+		const base = createNavigationState();
+		const startName = '出発場所\r\n[2年Iコース]';
+		const goalName = '展示ブース\n[1年1組]';
+		const navigation = createNavigationState({
+			graph: base.graph,
+			pois: base.pois.map((poi) =>
+				poi.id === 'poi_hr_2i'
+					? { ...poi, name: startName, keys: [] }
+					: poi.id === 'poi_hr_1-1'
+						? { ...poi, name: goalName, keys: [] }
+						: poi
+			)
+		});
+		const { container, getByRole } = await render(RouteSearchPanel, { navigation, snap: 'middle' });
+		expect(container.querySelector<HTMLInputElement>('input[aria-label="出発地"]')?.value).toBe(
+			'出発場所 [2年Iコース]'
+		);
+		await getByRole('combobox', { name: '行き先', exact: true }).fill('展示ブース [1年1組]');
+		await getByRole('button', { name: '展示ブース [1年1組]', exact: true }).click();
+		expect(container.querySelector<HTMLInputElement>('input[aria-label="行き先"]')?.value).toBe(
+			'展示ブース [1年1組]'
+		);
+		await getByRole('button', { name: 'ルート検索', exact: true }).click();
+		expect(navigation.routePath?.[0]).toBe('node_la_f2_hr_2i');
+		expect(navigation.routePath?.at(-1)).toBe('node_la_f1_hr_1-1');
+		expect(navigation.resolvePoi('poi_hr_2i')?.poi.name).toBe(startName);
+		expect(navigation.resolvePoi('poi_hr_1-1')?.poi.name).toBe(goalName);
 	});
 
 	it('POI選択時は下段にタイトル、中段に短い説明、上段に全文を表示する', async () => {

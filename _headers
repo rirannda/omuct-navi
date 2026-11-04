@@ -1,0 +1,4 @@
+/*
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: geolocation=(self)
+  Content-Security-Policy: frame-ancestors 'self'; connect-src 'self'

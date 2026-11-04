@@ -8,6 +8,7 @@ import { createNavigationState } from '../../states/navigation.svelte';
 import { flushSync } from 'svelte';
 import { baseMapFiles, buildingMaps } from '../../../data/maps';
 import { MAX_FLOOR_CONTROL_LINE_LENGTH } from '../../map/floorControlLayout';
+import { LOCATION_CONSENT_KEY } from '../../states/geolocation.svelte';
 
 const { maps } = vi.hoisted(() => ({ maps: [] as LType.Map[] }));
 vi.mock('leaflet', async (importOriginal) => {
@@ -23,10 +24,12 @@ vi.mock('leaflet', async (importOriginal) => {
 });
 
 beforeEach(async () => {
+	localStorage.setItem(LOCATION_CONSENT_KEY, 'declined');
 	await page.viewport(1280, 900);
 });
 
 afterEach(() => {
+	localStorage.removeItem(LOCATION_CONSENT_KEY);
 	vi.restoreAllMocks();
 	maps.length = 0;
 });

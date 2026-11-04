@@ -4,6 +4,7 @@ import * as L from 'leaflet';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { userEvent } from 'vitest/browser';
 import type { MapMarker } from '../../../data/types';
+import type { BuildingMap } from '../../../data/maps';
 import { createMarkerLayer } from '../markerLayer';
 import { highlightColors } from '../highlightColors';
 import toiletMenIcon from '../../assets/markers/toilet-men.svg';
@@ -29,6 +30,7 @@ const marker = (id: string, buildingId: string, floor: number, x: number): MapMa
 	icon: toiletMenIcon,
 	buildingId,
 	floor,
+	visibility: 'floor',
 	x,
 	y: 300
 });
@@ -44,22 +46,28 @@ function setup() {
 	document.body.appendChild(container);
 	map = L.map(container, { crs: L.CRS.Simple, zoomControl: false, attributionControl: false });
 	map.setView([300, 400], 0, { animate: false });
-	const view = { activeFloors: {} as Record<string, number> };
+	const buildings: BuildingMap[] = [
+		{ id: 'la', name: '教養棟', bounds: [0, 0, 10, 10], floors: { 1: 'f1.svg', 2: 'f2.svg' } },
+		{ id: 'only2', name: '2階のみ', bounds: [0, 0, 10, 10], floors: { 2: 'only2.svg' } }
+	];
+	const view = {
+		activeFloors: { la: 1, only2: 2 } as Record<string, number>,
+		visibleBuildings: buildings
+	};
 	const onSelect = vi.fn();
 	layer = createMarkerLayer(
 		L,
 		map,
 		[
-			{ ...marker('outdoor', 'outdoor', 0, 100), icon: trashIcon },
+			{ ...marker('outdoor', 'outdoor', 0, 100), icon: trashIcon, visibility: 'floor' },
 			marker('floor1', 'la', 1, 300),
-			{ ...marker('floor2', 'la', 2, 300), icon: toiletWomenIcon },
-			{ ...marker('no-detail', 'admin', 2, 500), icon: toiletAccessibleIcon },
+			{ ...marker('floor2', 'la', 2, 300), icon: toiletWomenIcon, visibility: 'floor' },
+			{ ...marker('always-floor2', 'la', 2, 400), visibility: 'always' },
+			{ ...marker('no-detail', 'admin', 2, 500), icon: toiletAccessibleIcon, visibility: 'always' },
+			marker('no-detail-floor', 'admin', 2, 600),
 			{ ...marker('only2', 'only2', 2, 700), icon: toiletWomenIcon }
 		],
-		[
-			{ id: 'la', name: '教養棟', bounds: [0, 0, 10, 10], floors: { 1: 'f1.svg', 2: 'f2.svg' } },
-			{ id: 'only2', name: '2階のみ', bounds: [0, 0, 10, 10], floors: { 2: 'only2.svg' } }
-		],
+		buildings,
 		() => view,
 		onSelect
 	);
@@ -69,10 +77,59 @@ function setup() {
 		Array.from(container!.querySelectorAll('.facility-marker-tooltip')).find((element) =>
 			element.textContent?.startsWith(`${id}（`)
 		) ?? null;
-	return { view, onSelect, element, tooltip };
+	return { view, buildings, onSelect, element, tooltip };
 }
 
 describe('facility markers', () => {
+	it('全体図では屋外と常時表示だけを表示し、保存された選択階では階限定を表示しない', () => {
+		const { view, element } = setup();
+		view.visibleBuildings = [];
+		layer!.render({ selected: 'floor1' });
+		expect(element('outdoor')).not.toBeNull();
+		expect(element('always-floor2')).not.toBeNull();
+		expect(element('no-detail')).not.toBeNull();
+		expect(element('floor1')).toBeNull();
+		expect(element('floor2')).toBeNull();
+		expect(element('only2')).toBeNull();
+		expect(element('no-detail-floor')).toBeNull();
+	});
+
+	it('建物・階の切り替えと全体図への復帰で階限定を切り替え、常時表示は維持する', () => {
+		const { view, buildings, element } = setup();
+		view.visibleBuildings = [buildings[0]];
+		layer!.updateVisible();
+		expect(element('floor1')).not.toBeNull();
+		expect(element('only2')).toBeNull();
+		view.activeFloors.la = 2;
+		layer!.updateVisible();
+		expect(element('floor1')).toBeNull();
+		expect(element('floor2')).not.toBeNull();
+		expect(element('always-floor2')).not.toBeNull();
+		view.visibleBuildings = [buildings[1]];
+		layer!.updateVisible();
+		expect(element('floor2')).toBeNull();
+		expect(element('only2')).not.toBeNull();
+		expect(element('always-floor2')).not.toBeNull();
+		view.visibleBuildings = [];
+		layer!.updateVisible();
+		expect(element('only2')).toBeNull();
+		expect(element('always-floor2')).not.toBeNull();
+	});
+
+	it('検索結果に絞り込んでも出発地・目的地のマーカーは残し、解除すると通常表示へ戻す', () => {
+		const { element } = setup();
+		layer!.render({}, ['no-detail']);
+		expect(element('no-detail')).not.toBeNull();
+		expect(element('outdoor')).toBeNull();
+		expect(element('floor1')).toBeNull();
+		layer!.render({ goal: 'outdoor' }, []);
+		expect(element('outdoor')).not.toBeNull();
+		expect(element('no-detail')).toBeNull();
+		layer!.render({});
+		expect(element('floor1')).not.toBeNull();
+		expect(element('no-detail')).not.toBeNull();
+	});
+
 	it('assetsの画像を読み込み、部屋のSVGなしでもタップとEnter・Spaceで選択できる', async () => {
 		const { element, onSelect } = setup();
 		const icon = element('outdoor')!;
@@ -98,7 +155,7 @@ describe('facility markers', () => {
 		expect(map!.getCenter()).toEqual(view);
 	});
 
-	it('建物の選択階だけ切り替え、屋外・詳細図なし・2階のみの施設も表示する', () => {
+	it('建物の選択階だけ切り替え、常時表示・屋外・選択中の2階のみの施設も表示する', () => {
 		const { element, view } = setup();
 		expect(element('floor1')).not.toBeNull();
 		expect(element('floor2')).toBeNull();

@@ -11,6 +11,11 @@
 | `src/lib/map/svgLayers.ts`                        | SVGの取得・検索、基本図・全体図・階別図の表示、画面上の建物形状への変換          |
 | `src/lib/map/poiLayer.ts`                         | POIの操作イベント、強調表示、吹き出し、イベントと表示資源の破棄                  |
 | `src/lib/map/markerLayer.ts`                      | SVG図形を使わない施設アイコン、選択・役割別の強調、階別表示、表示資源の破棄      |
+| `src/lib/map/nearbyFacilities.ts`                 | 施設の種別・建物による絞り込みと、地図上の距離での並べ替え                       |
+| `src/lib/states/geolocation.svelte.ts`            | GPSの初回確認・測位・エラー・停止、確認済み状態だけの端末内保存                  |
+| `src/lib/map/geolocationProjection.ts`            | 3つの基準点による緯度・経度から校内図への変換                                    |
+| `src/lib/map/routePosition.ts`                    | 表示中の階の経路と現在地の照合                                                   |
+| `src/lib/map/locationLayer.ts`                    | 現在地と測位精度の描画・破棄                                                     |
 | `src/lib/map/routeLayer.ts`                       | 経路線、始終点・階移動マーカー、ラベル配置、表示資源の破棄                       |
 | `src/lib/components/BuildingFloorControls.svelte` | 階操作パネルと接続線、サイズ変更と階変更の通知                                   |
 
