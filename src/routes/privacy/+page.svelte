@@ -1,7 +1,7 @@
 <script>
-	import { resolve } from "$app/paths";
-
+	import { resolve } from '$app/paths';
 </script>
+
 <svelte:head>
 	<title>位置情報の取り扱い | OMUCT Navi</title>
 	<meta
@@ -11,8 +11,9 @@
 </svelte:head>
 
 <main class="mx-auto min-h-dvh max-w-2xl space-y-7 bg-white px-6 py-10 text-slate-900">
-	<a href={resolve('/')} class="inline-block min-h-11 py-2 text-blue-700 underline underline-offset-4"
-		>地図へ戻る</a
+	<a
+		href={resolve('/')}
+		class="inline-block min-h-11 py-2 text-blue-700 underline underline-offset-4">地図へ戻る</a
 	>
 	<h1 class="text-2xl font-semibold">位置情報の取り扱い</h1>
 	<section class="space-y-2">
