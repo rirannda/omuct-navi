@@ -610,7 +610,7 @@
 	<div bind:this={mapContainer} class="map-container z-1 h-full w-full bg-[#898989]!"></div>
 	{#if bottomSheetSnap !== 'top'}
 		<p
-			class="pointer-events-none absolute top-2.5 right-2.5 left-14 z-1000 rounded border-2 border-yellow-400/90 bg-yellow-500/40 p-1 text-sm text-white"
+			class="pointer-events-none absolute top-2.5 right-2.5 left-14 z-1000 rounded border-2 border-yellow-400/90 bg-yellow-500/40 p-1 text-sm"
 		>
 			{projectDisclaimer}
 		</p>
@@ -692,10 +692,17 @@
 			/>
 			{#if bottomSheetSnap === 'top'}
 				<footer class="mx-auto mt-auto w-full max-w-2xl">
-					<p class="rounded border-2 border-yellow-500/80 bg-yellow-500/40 p-1 text-sm text-gray-800">
+					<p
+						class="rounded border-2 border-yellow-500/80 bg-yellow-500/40 p-1 text-sm text-gray-800"
+					>
 						{projectDisclaimer}
 					</p>
-					<a href="https://fes2026.omuct-gakuyukai.com/" target="_blank" rel="noopener noreferrer" class="border-b">
+					<a
+						href="https://fes2026.omuct-gakuyukai.com/"
+						target="_blank"
+						rel="noopener noreferrer"
+						class="border-b"
+					>
 						第62回高専祭特設サイト(別タブ)
 					</a>
 				</footer>
