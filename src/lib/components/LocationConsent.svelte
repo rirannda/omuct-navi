@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { resolve } from '$app/paths';
 	import type { NavigationState } from '../states/navigation.svelte';
 
 	let { navigation }: { navigation: NavigationState } = $props();
@@ -33,7 +34,7 @@
 		<p>同意後、必要に応じてブラウザからも位置情報の許可を求められます。</p>
 	</div>
 	<a
-		href="/privacy"
+		href={resolve('/privacy')}
 		target="_blank"
 		rel="noopener"
 		class="mt-3 inline-block min-h-11 py-2 text-sm text-blue-700 underline underline-offset-4"

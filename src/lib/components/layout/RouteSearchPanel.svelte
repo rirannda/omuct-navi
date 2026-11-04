@@ -9,6 +9,7 @@
 	import { buildingMaps } from '../../../data/maps';
 	import { buildingNames } from '../../../data/buildings';
 	import { formatFloorLabel } from '../../map/floorDisplay';
+	import { resolve } from '$app/paths';
 
 	let {
 		navigation = requireNavigation(),
@@ -316,7 +317,7 @@
 			class="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-3 text-sm"
 		>
 			<a
-				href="/privacy"
+				href={resolve('/privacy')}
 				target="_blank"
 				rel="noopener"
 				class="min-h-11 py-2 text-blue-700 underline underline-offset-4"
