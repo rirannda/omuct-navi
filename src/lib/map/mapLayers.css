@@ -47,6 +47,12 @@
 	pointer-events: all !important;
 }
 
+/* SVGの部屋領域のうち、POIとして選択できない場所を区別します。 */
+.map-room:not(.poi-selectable, .poi-selectable *) {
+	fill: #9ca3af !important;
+	fill-opacity: 1;
+}
+
 .poi-highlight,
 .poi-highlight :is(path, rect, polygon, circle, ellipse, polyline) {
 	fill: var(--poi-highlight-fill, #fbbf24) !important;
