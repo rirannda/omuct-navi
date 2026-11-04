@@ -8,19 +8,30 @@ beforeEach(() => localStorage.removeItem(LOCATION_CONSENT_KEY));
 afterEach(() => localStorage.removeItem(LOCATION_CONSENT_KEY));
 
 describe('nearby facility search UI', () => {
-	it('通常版には施設ボタンを出さず、バリアフリーは中段のときだけ表示する', async () => {
+	it('通常版には施設ボタンを出さず、中段・上段のオプション内にバリアフリーを表示する', async () => {
 		const navigation = createFacilityNavigation('normal');
-		const { container, rerender } = await render(RouteSearchPanel, { navigation, snap: 'bottom' });
+		const { container, getByRole, rerender } = await render(RouteSearchPanel, {
+			navigation,
+			snap: 'bottom'
+		});
 		expect(container.querySelector('[role="switch"]')).toBeNull();
 		await rerender({ navigation, snap: 'middle' });
-		expect(container.querySelector('[role="switch"]')).not.toBeNull();
+		const options = container.querySelector('details')!;
+		expect(options.open).toBe(false);
+		expect(options.getBoundingClientRect().top).toBeGreaterThanOrEqual(
+			container.querySelector('button[type="submit"]')!.getBoundingClientRect().bottom
+		);
+		container.querySelector('summary')!.click();
+		await getByRole('switch', { name: 'バリアフリー' }).click();
+		expect(navigation.barrierFree).toBe(true);
 		expect(container.textContent).not.toContain('近くのトイレを表示');
 		expect(container.textContent).not.toContain('近くのゴミ箱を表示');
 		await rerender({ navigation, snap: 'top' });
-		expect(container.querySelector('[role="switch"]')).toBeNull();
+		await getByRole('switch', { name: 'バリアフリー' }).click();
+		expect(navigation.barrierFree).toBe(false);
 	});
 
-	it('高専祭版は下段から施設ボタンを表示し、中段だけバリアフリーを並べる', async () => {
+	it('高専祭版は下段から施設ボタンを表示し、バリアフリーをオプションへ分ける', async () => {
 		const navigation = createFacilityNavigation();
 		const { container, getByRole, rerender } = await render(RouteSearchPanel, {
 			navigation,
@@ -31,8 +42,9 @@ describe('nearby facility search UI', () => {
 		expect(options().querySelector('[aria-label="近くのトイレを表示"]')).not.toBeNull();
 		expect(options().querySelector('[aria-label="近くのゴミ箱を表示"]')).not.toBeNull();
 		await rerender({ navigation, snap: 'middle' });
-		expect(options().querySelector('[role="switch"]')).not.toBeNull();
-		expect(options().querySelectorAll('button')).toHaveLength(3);
+		expect(options().querySelector('[role="switch"]')).toBeNull();
+		expect(options().querySelectorAll('button')).toHaveLength(2);
+		container.querySelector('summary')!.click();
 		await getByRole('switch', { name: 'バリアフリー' }).click();
 		expect(navigation.barrierFree).toBe(true);
 		await rerender({ navigation, snap: 'top' });

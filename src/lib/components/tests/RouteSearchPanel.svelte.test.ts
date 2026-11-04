@@ -97,6 +97,7 @@ describe('RouteSearchPanel', () => {
 			});
 			await getByRole('button', { name: 'ルート検索', exact: true }).click();
 			expect(navigation.routePath).toEqual([from.id, to.id]);
+			container.querySelector('summary')!.click();
 			await getByRole('switch', { name: 'バリアフリー' }).click();
 			expect(container.querySelector('[role="switch"]')?.getAttribute('aria-checked')).toBe('true');
 			if (hasDetour) {

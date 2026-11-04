@@ -11,6 +11,7 @@
 		snap = $bindable<BottomSheetSnap>('bottom'),
 		peekHeight = BOTTOM_SHEET_PEEK_HEIGHT,
 		middleMinHeight = 320,
+		contentMinHeight,
 		onheightchange,
 		onsettle,
 		children
@@ -20,6 +21,8 @@
 		peekHeight?: number;
 		/** 中段の操作欄を収める最低高。表示領域の高さで上限を設けます。 */
 		middleMinHeight?: number;
+		/** 中段でスクロールなしで見せるために必要な内容の高さ。 */
+		contentMinHeight?: number;
 		/** アニメーション・ドラッグ中も、画面を覆っている高さを通知します。 */
 		onheightchange?: (height: number) => void;
 		onsettle?: (snap: BottomSheetSnap, height: number) => void;
@@ -31,6 +34,8 @@
 	const id = $props.id();
 	const contentId = `${id}-content`;
 	let availableHeight = $state(0);
+	let handle: HTMLButtonElement | undefined;
+	let content: HTMLDivElement | undefined;
 	let height = $state(untrack(() => peekHeight));
 	let dragging = $state(false);
 	let animationFrame: number | undefined;
@@ -47,8 +52,21 @@
 		const maximum = availableHeight || peekHeight;
 		if (position === 'top') return maximum;
 		if (position === 'middle')
-			return Math.min(maximum, Math.max(middleMinHeight, maximum * MIDDLE_HEIGHT_RATIO));
+			return Math.min(
+				maximum,
+				Math.max(
+					middleMinHeight,
+					maximum * MIDDLE_HEIGHT_RATIO,
+					contentMinHeight ? contentMinHeight + chromeHeight() : 0
+				)
+			);
 		return Math.min(peekHeight, maximum);
+	}
+
+	function chromeHeight(): number {
+		if (!handle || !content) return 0;
+		const { paddingTop, paddingBottom } = getComputedStyle(content);
+		return handle.offsetHeight + parseFloat(paddingTop) + parseFloat(paddingBottom);
 	}
 
 	function cancelAnimation() {
@@ -152,6 +170,7 @@
 		aria-label="ボトムシート"
 	>
 		<button
+			bind:this={handle}
 			class={[
 				'drag-handle flex w-full flex-[0_0_48px] touch-none items-center justify-center rounded-t-3xl border-0 bg-transparent p-0 select-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-[#2563eb] focus-visible:outline-solid',
 				dragging ? 'cursor-grabbing' : 'cursor-grab'
@@ -170,6 +189,7 @@
 			<span class="h-1 w-9 rounded-full bg-[#b8bdc5]" aria-hidden="true"></span>
 		</button>
 		<div
+			bind:this={content}
 			class="sheet-content min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pt-1 pb-[max(16px,env(safe-area-inset-bottom))]"
 			id={contentId}
 		>

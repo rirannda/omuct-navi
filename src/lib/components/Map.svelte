@@ -63,9 +63,10 @@
 	let settledSheetSnap = $state<BottomSheetSnap>('bottom');
 	let appliedFocusRequest: NavigationState['focusRequest'] = null;
 	let appliedFacilitySearch: NavigationState['facilitySearch'] = null;
+	let sheetContentMinHeight = $state<number>();
 	let bottomSheetHeight = $state(BOTTOM_SHEET_PEEK_HEIGHT);
 	let rootFontSize = $state(16);
-	const middleMinHeight = $derived(20 * rootFontSize + 56);
+	const middleMinHeight = $derived((navigation.isFestival ? 22.5 : 20) * rootFontSize + 56);
 	const peekHeight = $derived(
 		navigation.isFestival ? 8.5 * rootFontSize + 56 : BOTTOM_SHEET_PEEK_HEIGHT
 	);
@@ -640,13 +641,18 @@
 		bind:snap={bottomSheetSnap}
 		{peekHeight}
 		{middleMinHeight}
+		contentMinHeight={sheetContentMinHeight}
 		onheightchange={(height) => (bottomSheetHeight = height)}
 		onsettle={(snap, height) => {
 			bottomSheetHeight = height;
 			settledSheetSnap = snap;
 		}}
 	>
-		<RouteSearchPanel {navigation} bind:snap={bottomSheetSnap} />
+		<RouteSearchPanel
+			{navigation}
+			bind:snap={bottomSheetSnap}
+			bind:contentMinHeight={sheetContentMinHeight}
+		/>
 	</BottomSheet>
 </div>
 

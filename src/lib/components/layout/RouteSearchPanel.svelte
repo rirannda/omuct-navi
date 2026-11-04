@@ -12,10 +12,15 @@
 
 	let {
 		navigation = requireNavigation(),
-		snap = $bindable<BottomSheetSnap>('bottom')
+		snap = $bindable<BottomSheetSnap>('bottom'),
+		// 親へ値を渡す出力専用の bindable のため、読み取りはない。
+		// eslint-disable-next-line no-useless-assignment
+		contentMinHeight = $bindable<number | undefined>()
 	}: {
 		navigation?: NavigationState;
 		snap?: BottomSheetSnap;
+		/** オプション展開時に内容を収めるために必要な高さ。 */
+		contentMinHeight?: number;
 	} = $props();
 
 	type Role = 'start' | 'goal';
@@ -23,6 +28,8 @@
 	let startQuery = $state('');
 	let goalQuery = $state('');
 	let errorMessage = $state<HTMLParagraphElement>();
+	let optionsOpen = $state(false);
+	let panelHeight = $state(0);
 	const expanded = $derived(snap !== 'bottom');
 	const poi = $derived(navigation.selectedPoi);
 	const location = $derived(poi ? navigation.resolvePoi(poi.id) : undefined);
@@ -49,6 +56,10 @@
 			goalQuery === singleLineDestinationName(goal.poi.name)
 	);
 	const resultsMaxHeight = $derived(snap === 'top' ? 'max(8rem, calc(100dvh - 20rem))' : '10rem');
+
+	$effect(() => {
+		contentMinHeight = expanded && !poi && optionsOpen ? panelHeight : undefined;
+	});
 
 	$effect(() => {
 		if (start) startQuery = singleLineDestinationName(start.poi.name);
@@ -104,7 +115,10 @@
 	}
 </script>
 
-<div class="route-search-panel mx-auto w-full max-w-2xl text-slate-900">
+<div
+	class="route-search-panel mx-auto w-full max-w-2xl text-slate-900"
+	bind:clientHeight={panelHeight}
+>
 	{#if poi}
 		<section aria-label="選択した施設の情報" class={expanded ? 'space-y-4' : 'space-y-1'}>
 			<div class="flex items-start justify-between gap-3">
@@ -213,16 +227,50 @@
 					</div>
 				</div>
 			</div>
-			{#if snap === 'middle' || (navigation.isFestival && (snap === 'bottom' || navigation.facilitySearch))}
+			{#if navigation.isFestival && (snap !== 'top' || navigation.facilitySearch)}
 				<div class="flex flex-wrap items-center gap-2" aria-label="検索オプション">
-					{#if snap === 'middle'}
+					<NearbyFacilitySearch
+						{navigation}
+						showButtons={snap !== 'top'}
+						showSearch={expanded}
+						onsearch={() => {
+							if (snap === 'bottom') snap = 'middle';
+						}}
+						onselect={selectFacility}
+					/>
+				</div>
+			{/if}
+			{#if expanded}
+				<div class="flex flex-wrap gap-2 pt-1">
+					<button
+						type="submit"
+						class="min-h-11 flex-1 rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-500"
+						disabled={!canNavigate}>ルート検索</button
+					>
+					{#if navigation.routePath}
+						<button
+							type="button"
+							class="min-h-11 rounded-full border border-slate-300 px-5 py-2 text-sm"
+							onclick={() => navigation.clearRoute()}>経路を解除</button
+						>
+					{/if}
+				</div>
+				<details class="group" bind:open={optionsOpen}>
+					<summary
+						class="flex min-h-11 w-fit cursor-pointer list-none items-center gap-1 text-sm font-medium text-blue-600 focus-visible:outline-2 focus-visible:outline-blue-600 [&::-webkit-details-marker]:hidden"
+						>オプション<span
+							aria-hidden="true"
+							class="text-xs transition-transform group-open:rotate-180">▾</span
+						></summary
+					>
+					<div class="pb-2">
 						<button
 							type="button"
 							role="switch"
 							aria-label="バリアフリー"
 							aria-checked={navigation.barrierFree}
 							aria-describedby={`${id}-barrier-free-hint`}
-							class="flex min-h-13 w-24 shrink-0 flex-col items-center justify-center gap-1 rounded-lg px-1 text-xs font-medium text-slate-600 focus-visible:outline-2 focus-visible:outline-blue-600"
+							class="flex min-h-11 w-full items-center justify-between gap-3 rounded-lg text-sm font-medium text-slate-600 focus-visible:outline-2 focus-visible:outline-blue-600"
 							onclick={() => navigation.setBarrierFree(!navigation.barrierFree)}
 						>
 							<span>バリアフリー</span>
@@ -244,35 +292,8 @@
 						<span id={`${id}-barrier-free-hint`} class="sr-only"
 							>階段を使わない経路を検索します。</span
 						>
-					{/if}
-					{#if navigation.isFestival}
-						<NearbyFacilitySearch
-							{navigation}
-							showButtons={snap !== 'top'}
-							showSearch={expanded}
-							onsearch={() => {
-								if (snap === 'bottom') snap = 'middle';
-							}}
-							onselect={selectFacility}
-						/>
-					{/if}
-				</div>
-			{/if}
-			{#if expanded}
-				<div class="flex flex-wrap gap-2 pt-1">
-					<button
-						type="submit"
-						class="min-h-11 flex-1 rounded-full bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:bg-slate-200 disabled:text-slate-500"
-						disabled={!canNavigate}>ルート検索</button
-					>
-					{#if navigation.routePath}
-						<button
-							type="button"
-							class="min-h-11 rounded-full border border-slate-300 px-5 py-2 text-sm"
-							onclick={() => navigation.clearRoute()}>経路を解除</button
-						>
-					{/if}
-				</div>
+					</div>
+				</details>
 			{/if}
 		</form>
 	{/if}

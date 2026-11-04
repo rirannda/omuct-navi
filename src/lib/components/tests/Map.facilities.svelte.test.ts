@@ -36,9 +36,10 @@ async function setup() {
 
 describe('Map facility controls', () => {
 	it.each([16, 24])(
-		'高専祭の下段・中段で文字サイズ%i pxでも施設ボタンを収める',
+		'文字サイズ%i pxでも施設ボタンを収め、オプションの開閉に合わせて高さを変える',
 		async (fontSize) => {
 			await page.viewport(390, 844);
+			vi.spyOn(window, 'matchMedia').mockReturnValue({ matches: true } as MediaQueryList);
 			const root = document.documentElement;
 			const previousFontSize = root.style.fontSize;
 			try {
@@ -62,10 +63,24 @@ describe('Map facility controls', () => {
 				await getByRole('button', { name: 'ボトムシートの高さを変更' }).click();
 				await expect.poll(() => content.scrollHeight - content.clientHeight).toBeLessThanOrEqual(1);
 				const options = container.querySelector('[aria-label="検索オプション"]')!;
-				expect(options.querySelectorAll('button')).toHaveLength(3);
+				expect(options.querySelectorAll('button')).toHaveLength(2);
 				expect(
 					container.querySelector('button[type="submit"]')!.getBoundingClientRect().bottom
 				).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
+				const sheet = container.querySelector<HTMLElement>('.bottom-sheet')!;
+				const collapsedHeight = sheet.getBoundingClientRect().height;
+				const summary = container.querySelector('summary')!;
+				summary.click();
+				await expect
+					.poll(() => sheet.getBoundingClientRect().height)
+					.toBeGreaterThan(collapsedHeight);
+				await expect.poll(() => content.scrollHeight - content.clientHeight).toBeLessThanOrEqual(1);
+				expect(sheet.dataset.snap).toBe('middle');
+				expect(
+					container.querySelector('[role="switch"]')!.getBoundingClientRect().bottom
+				).toBeLessThanOrEqual(content.getBoundingClientRect().bottom);
+				summary.click();
+				await expect.poll(() => sheet.getBoundingClientRect().height).toBe(collapsedHeight);
 			} finally {
 				root.style.fontSize = previousFontSize;
 			}
