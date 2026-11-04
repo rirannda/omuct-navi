@@ -4,6 +4,7 @@
 	import '../map/mapLayers.css';
 	import type * as L from 'leaflet';
 	import { baseMapFiles, buildingMaps } from '../../data/maps';
+	import { geolocationReferenceSource } from '../../data/geolocation';
 	import type { BuildingMap } from '../../data/maps';
 	import type { Node } from '../../data/types';
 	import type { NavigationState, PoiHighlights } from '../states/navigation.svelte';
@@ -29,6 +30,11 @@
 	import RouteSearchPanel from './layout/RouteSearchPanel.svelte';
 
 	let { navigation }: { navigation: NavigationState } = $props();
+	const id = $props.id();
+	const locationHintId = `${id}-location-stop-hint`;
+	const showLocationHint = $derived(
+		navigation.gpsLocation.enabled || navigation.gps.requesting || navigation.gps.error !== null
+	);
 	const initialNavigation = untrack(() => navigation);
 	const getConnectedFloor = createConnectedFloorLookup(
 		initialNavigation.graph.nodes,
@@ -493,6 +499,9 @@
 				});
 				map = mountedMap;
 				mountedMap.attributionControl.setPosition('bottomleft');
+				mountedMap.attributionControl.addAttribution(
+					`位置補正基準点：<a href="${geolocationReferenceSource.url}" target="_blank" rel="external noopener noreferrer">地理院地図</a>を加工`
+				);
 				for (const [name, zIndex] of [
 					['floor-maps', 420],
 					['route-lines', 430],
@@ -598,35 +607,55 @@
 >
 	<div bind:this={mapContainer} class="map-container z-1 h-full w-full bg-[#898989]!"></div>
 	{#if bottomSheetSnap !== 'top'}
-		<button
-			type="button"
-			class="current-location-button absolute right-2 z-1000 flex size-11 items-center justify-center rounded-lg border border-slate-300 bg-white text-blue-700 shadow-md hover:bg-blue-50 disabled:cursor-not-allowed disabled:text-slate-400"
-			style:bottom={`calc(${bottomSheetHeight}px + 0.5rem)`}
-			aria-label="現在地に移動"
-			aria-pressed={followArmed && !!navigation.routePath && navigation.gpsLocation.enabled}
-			aria-busy={navigation.gpsLocation.enabled && !navigation.gpsLocation.position}
-			title={navigation.gpsLocation.enabled
-				? navigation.gpsLocation.position
-					? '現在地に移動'
-					: '現在地を取得中です'
-				: '現在地に移動'}
-			disabled={navigation.gpsLocation.enabled && !navigation.gpsLocation.position}
-			onclick={() => navigation.requestCurrentLocation()}
+		<div
+			class="pointer-events-none absolute right-2 z-1000 flex max-w-[calc(100%-1rem)] items-center gap-2"
+			style:bottom={`calc(${bottomSheetHeight}px + ${showLocationHint ? '2rem' : '0.5rem'})`}
 		>
-			<svg
-				aria-hidden="true"
-				class="size-6"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="currentColor"
-				stroke-width="2"
-				stroke-linecap="round"
+			{#if showLocationHint}
+				<p
+					id={locationHintId}
+					class="max-w-44 rounded-lg bg-white/95 px-3 py-2 text-xs leading-5 text-slate-600 shadow-sm"
+				>
+					<span class="block"
+						>{navigation.gps.error
+							? '現在地を取得できません。'
+							: navigation.gpsLocation.enabled
+								? '位置情報を取得中です。'
+								: '位置情報の利用を確認中です。'}</span
+					>
+					<span class="block">停止は下のシートから。</span>
+				</p>
+			{/if}
+			<button
+				type="button"
+				class="current-location-button pointer-events-auto flex size-11 shrink-0 items-center justify-center rounded-lg border border-slate-300 bg-white text-blue-700 shadow-md hover:bg-blue-50 disabled:cursor-not-allowed disabled:text-slate-400"
+				aria-label="現在地に移動"
+				aria-describedby={showLocationHint ? locationHintId : undefined}
+				aria-pressed={followArmed && !!navigation.routePath && navigation.gpsLocation.enabled}
+				aria-busy={navigation.gpsLocation.enabled && !navigation.gpsLocation.position}
+				title={navigation.gpsLocation.enabled
+					? navigation.gpsLocation.position
+						? '現在地に移動'
+						: '現在地を取得中です'
+					: '現在地に移動'}
+				disabled={navigation.gpsLocation.enabled && !navigation.gpsLocation.position}
+				onclick={() => navigation.requestCurrentLocation()}
 			>
-				<circle cx="12" cy="12" r="7" />
-				<circle cx="12" cy="12" r="2" />
-				<path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-			</svg>
-		</button>
+				<svg
+					aria-hidden="true"
+					class="size-6"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+					stroke-linecap="round"
+				>
+					<circle cx="12" cy="12" r="7" />
+					<circle cx="12" cy="12" r="2" />
+					<path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+				</svg>
+			</button>
+		</div>
 	{/if}
 	<BuildingFloorControls
 		buildings={controlBuildings}

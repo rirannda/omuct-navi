@@ -1,6 +1,6 @@
 <script module lang="ts">
 	export type BottomSheetSnap = 'bottom' | 'middle' | 'top';
-	export const BOTTOM_SHEET_PEEK_HEIGHT = 120;
+	export const BOTTOM_SHEET_PEEK_HEIGHT = 144;
 </script>
 
 <script lang="ts">

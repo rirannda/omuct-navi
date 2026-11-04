@@ -33,7 +33,7 @@ afterEach(() => {
 async function setup() {
 	let success!: PositionCallback;
 	const appConfirmationOpenAtWatch: boolean[] = [];
-	const watchPosition = vi.fn((callback: PositionCallback) => {
+	const watchPosition = vi.fn<Geolocation['watchPosition']>((callback) => {
 		appConfirmationOpenAtWatch.push(document.querySelector('dialog[open]') !== null);
 		success = callback;
 		return 11;
@@ -208,6 +208,97 @@ describe('GPS interactions', () => {
 		await app.unmount();
 		expect(app.clearWatch).toHaveBeenCalledWith(11);
 	});
+	it.each([390, 1280])(
+		'現在地付近に停止方法を案内し、中段で停止した後は検索では再開せず現在地ボタンで確認し直す (%s)',
+		async (width) => {
+			await page.viewport(width, 844);
+			const app = await setup();
+			const currentLocation = app.getByRole('button', { name: '現在地に移動', exact: true });
+			await currentLocation.click();
+			await app.getByRole('button', { name: '同意して利用', exact: true }).click();
+			app.position(450);
+			const button = app.container.querySelector('.current-location-button')!;
+			const hint = app.container.querySelector<HTMLElement>(
+				`[id="${button.getAttribute('aria-describedby')}"]`
+			)!;
+			expect(hint.textContent).toContain('停止は下のシートから。');
+			expect(hint.getBoundingClientRect().right).toBeLessThanOrEqual(
+				button.getBoundingClientRect().left
+			);
+			expect(hint.getBoundingClientRect().left).toBeGreaterThanOrEqual(0);
+			const attribution = app.container.querySelector('.leaflet-control-attribution')!;
+			expect(hint.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+				attribution.getBoundingClientRect().top
+			);
+			await app.getByRole('button', { name: 'ボトムシートの高さを変更' }).click();
+			const sheet = app.container.querySelector<HTMLElement>('.bottom-sheet')!;
+			const stop = Array.from(sheet.querySelectorAll('button')).find(
+				(element) => element.textContent?.trim() === '位置情報の利用を停止'
+			)!;
+			expect(sheet.dataset.snap).toBe('middle');
+			await expect
+				.poll(() => stop.getBoundingClientRect().bottom <= sheet.getBoundingClientRect().bottom)
+				.toBe(true);
+			await app.getByRole('button', { name: '位置情報の利用を停止', exact: true }).click();
+			expect(app.clearWatch).toHaveBeenCalledWith(11);
+			expect(app.navigation.gpsLocation).toEqual({ enabled: false });
+			expect(localStorage.getItem(LOCATION_CONSENT_KEY)).toBe('declined');
+			await expect.poll(() => app.container.querySelector(`#${CSS.escape(hint.id)}`)).toBeNull();
+			app.navigation.setHighlight('poi-0', 'start');
+			app.navigation.setHighlight('poi-2', 'goal');
+			await app.getByRole('button', { name: 'ルート検索', exact: true }).click();
+			expect(app.navigation.routePath).toEqual(['node-0', 'node-1', 'node-2']);
+			expect(await app.navigation.requestGps()).toBe(false);
+			expect(app.container.querySelector('dialog[open]')).toBeNull();
+			expect(app.watchPosition).toHaveBeenCalledTimes(1);
+			await currentLocation.click();
+			expect(app.container.querySelector('dialog[open]')).not.toBeNull();
+			expect(app.watchPosition).toHaveBeenCalledTimes(1);
+			await app.getByRole('button', { name: '同意して利用', exact: true }).click();
+			expect(app.watchPosition).toHaveBeenCalledTimes(2);
+		}
+	);
+	it('初回測位を待つ間も中段から停止でき、遅い位置更新を表示しない', async () => {
+		const app = await setup();
+		await app.getByRole('button', { name: '現在地に移動', exact: true }).click();
+		await app.getByRole('button', { name: '同意して利用', exact: true }).click();
+		expect(
+			app.container.querySelector<HTMLButtonElement>('.current-location-button')!.disabled
+		).toBe(true);
+		await app.getByRole('button', { name: 'ボトムシートの高さを変更' }).click();
+		await app.getByRole('button', { name: '位置情報の利用を停止', exact: true }).click();
+		app.position(450);
+		expect(app.clearWatch).toHaveBeenCalledWith(11);
+		expect(app.navigation.gpsLocation).toEqual({ enabled: false });
+		expect(app.container.querySelector('.current-location-marker')).toBeNull();
+	});
+	it.each(['outside', 'timeout'] as const)(
+		'測位エラー後もシートから利用停止を選び、エラーと次の検索での自動再開を解除できる (%s)',
+		async (reason) => {
+			const app = await setup();
+			await app.getByRole('button', { name: '現在地に移動', exact: true }).click();
+			await app.getByRole('button', { name: '同意して利用', exact: true }).click();
+			if (reason === 'outside') app.position(2000);
+			else app.watchPosition.mock.calls[0][1]!({ code: 3 } as GeolocationPositionError);
+			expect(app.navigation.gps.active).toBe(false);
+			expect(app.navigation.gps.error).toContain(
+				reason === 'outside' ? '範囲外' : '時間がかかっています'
+			);
+			expect(localStorage.getItem(LOCATION_CONSENT_KEY)).toBe('accepted');
+			await expect
+				.poll(() => app.container.querySelector('[id$="-location-stop-hint"]')?.textContent)
+				.toContain('現在地を取得できません。');
+			await app.getByRole('button', { name: 'ボトムシートの高さを変更' }).click();
+			await app.getByRole('button', { name: '位置情報の利用を停止', exact: true }).click();
+			expect(app.navigation.gps.error).toBeNull();
+			expect(app.navigation.gpsLocation).toEqual({ enabled: false });
+			expect(localStorage.getItem(LOCATION_CONSENT_KEY)).toBe('declined');
+			app.navigation.requestGpsForRoute();
+			expect(await app.navigation.requestGps()).toBe(false);
+			expect(app.watchPosition).toHaveBeenCalledTimes(1);
+			expect(app.container.querySelector('dialog[open]')).toBeNull();
+		}
+	);
 
 	it('確認のキャンセルでは測位せず手動検索に進み、現在地ボタンの確認はEscapeでも閉じる', async () => {
 		const app = await setup();

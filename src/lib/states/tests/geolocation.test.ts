@@ -75,6 +75,73 @@ describe('geolocation state', () => {
 		gps.stop();
 		expect(environment.geolocation!.clearWatch).toHaveBeenCalledWith(7);
 	});
+	it('明示停止は位置を破棄し、画面を開き直しても現在地ボタンで選び直すまで再開しない', async () => {
+		const { gps, environment, options, onLocation, storage, position } = setup('accepted');
+		await gps.request();
+		position();
+		gps.disable();
+		expect(gps.active).toBe(false);
+		expect(environment.geolocation!.clearWatch).toHaveBeenCalledWith(7);
+		expect(storage.get(LOCATION_CONSENT_KEY)).toBe('declined');
+		position();
+		expect(onLocation.mock.lastCall![0]).toEqual({ enabled: false });
+		expect(await gps.request()).toBe(false);
+		const reopened = createGeolocationState(options);
+		expect(await reopened.request()).toBe(false);
+		expect(reopened.consentOpen).toBe(false);
+		expect(environment.geolocation!.watchPosition).toHaveBeenCalledTimes(1);
+		const retry = reopened.request({ retryDeclined: true });
+		expect(reopened.consentOpen).toBe(true);
+		expect(environment.geolocation!.watchPosition).toHaveBeenCalledTimes(1);
+		reopened.confirmConsent(true);
+		expect(await retry).toBe(true);
+		expect(storage.get(LOCATION_CONSENT_KEY)).toBe('accepted');
+		expect(environment.geolocation!.watchPosition).toHaveBeenCalledTimes(2);
+		reopened.stop();
+	});
+	it('自動停止では同意を維持し、次の検索から再開できる', async () => {
+		const { gps, environment, storage } = setup('accepted');
+		await gps.request();
+		gps.stop();
+		expect(storage.get(LOCATION_CONSENT_KEY)).toBe('accepted');
+		expect(gps.hasConsent()).toBe(true);
+		expect(await gps.request()).toBe(true);
+		expect(gps.consentOpen).toBe(false);
+		expect(environment.geolocation!.watchPosition).toHaveBeenCalledTimes(2);
+		gps.stop();
+	});
+	it('許可状態の照会中に明示停止すると、遅れて許可済みと分かっても測位しない', async () => {
+		const { gps, environment } = setup('accepted');
+		let resolvePermission!: (status: PermissionStatus) => void;
+		const permission = new Promise<PermissionStatus>((resolve) => (resolvePermission = resolve));
+		environment.permissions!.query = vi.fn<Permissions['query']>().mockReturnValue(permission);
+		const request = gps.request();
+		gps.disable();
+		expect(await request).toBe(false);
+		resolvePermission({ state: 'granted' } as PermissionStatus);
+		await permission;
+		expect(gps.requesting).toBe(false);
+		expect(gps.consentOpen).toBe(false);
+		expect(await gps.request()).toBe(false);
+		expect(environment.geolocation!.watchPosition).not.toHaveBeenCalled();
+	});
+	it.each(['unavailable', 'write-failed'] as const)(
+		'選択結果を保存できなくても明示停止後は同じ画面で再開しない (%s)',
+		async (storageState) => {
+			const { gps, environment } = setup('accepted');
+			await gps.request();
+			if (storageState === 'unavailable') environment.storage = undefined;
+			else
+				environment.storage!.setItem = () => {
+					throw new Error('storage unavailable');
+				};
+			gps.disable();
+			expect(gps.hasConsent()).toBe(false);
+			expect(await gps.request()).toBe(false);
+			expect(gps.consentOpen).toBe(false);
+			expect(environment.geolocation!.watchPosition).toHaveBeenCalledTimes(1);
+		}
+	);
 	it('拒否や確認中の破棄では測位せず、確認済みなら再表示せず取得する', async () => {
 		const { gps, environment, storage } = setup();
 		const first = gps.request();
