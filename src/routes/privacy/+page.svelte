@@ -17,6 +17,7 @@
 		class="inline-block min-h-11 py-2 text-blue-700 underline underline-offset-4">地図へ戻る</a
 	>
 	<h1 class="text-2xl font-semibold">位置情報の取り扱い</h1>
+	<p>!MS チーム - 大阪公立大学工業高等専門学校</p>
 	<section class="space-y-2">
 		<h2 class="text-lg font-semibold">利用目的と取得する情報</h2>
 		<p class="leading-7">
