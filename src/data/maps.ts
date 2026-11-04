@@ -30,10 +30,7 @@ export const buildingMaps: BuildingMap[] = [
 		name: buildingNames.ss1,
 		bounds: [627, 836, 933, 929.5],
 		floors: {
-			1: 'ss-bldg_1_F1.svg',
-			2: 'ss-bldg_1_F2.svg',
-			3: 'ss-bldg_1_F3.svg',
-			4: 'ss-bldg_1_F4.svg'
+			2: 'ss-bldg_1_F2.svg'
 		}
 	},
 	{
@@ -42,24 +39,14 @@ export const buildingMaps: BuildingMap[] = [
 		name: buildingNames.ss2,
 		bounds: [256, 836, 579, 929],
 		floors: {
-			1: 'ss-bldg_2_F1.svg',
-			2: 'ss-bldg_2_F2.svg',
-			3: 'ss-bldg_2_F3.svg',
-			4: 'ss-bldg_2_F4.svg'
+			2: 'ss-bldg_2_F2.svg'
 		}
-	},
-	{
-		id: 'cepc',
-		svgId: 'cpec-bldg',
-		name: buildingNames.cepc,
-		bounds: [951.5, 805.5, 1116, 889.5],
-		floors: { 1: 'cepc-bldg_F1.svg', 2: 'cepc-bldg_F2.svg', 3: 'cepc-bldg_F3.svg' }
 	},
 	{
 		id: 'gym',
 		name: buildingNames.gym,
 		bounds: [741, 1317, 954, 1453],
-		floors: { 1: 'gym_F1.svg', 2: 'gym_F2.svg' }
+		floors: { 1: 'gym_F1.svg' }
 	},
 	{
 		id: 'lib',
@@ -71,9 +58,8 @@ export const buildingMaps: BuildingMap[] = [
 		id: 'cafe',
 		name: buildingNames.cafe,
 		bounds: [748, 1195, 832.5, 1272],
-		floors: { 0: 'cafe_B1.svg', 1: 'cafe_F1.svg' },
-		floorOrder: [1, 0],
-		floorLabels: { 0: '地上' }
+		floors: { 1: 'cafe_F1.svg' },
+		floorOrder: [1]
 	},
 	{
 		id: 'mah',
@@ -88,9 +74,7 @@ export const buildingMaps: BuildingMap[] = [
 		bounds: [579, 836, 627, 929.5],
 		floors: {
 			1: 'staircase_F1.svg',
-			2: 'staircase_F2.svg',
-			3: 'staircase_F3.svg',
-			4: 'staircase_F4.svg'
+			2: 'staircase_F2.svg'
 		}
 	},
 	{
